@@ -5,14 +5,24 @@ public class Citizen {
     private boolean wantsFeedback;
 
     public Citizen(String email, boolean wantsFeedback){
-        this.email="";
-        this.wantsFeedback=false;
+        this.email= email;
+        this.wantsFeedback=wantsFeedback;
 
     }
 
-    public Issue sumbmitIssue(String location,String description, Category category){
+    public Issue submitIssue(String location,String description, Category category){
 
         return new Issue(location, description, category,this);
+    }
+
+    // Getter to check if the citizen wants feedback
+    public boolean wantsFeedback() {
+        return this.wantsFeedback;
+    }
+
+    // Getter for the email (not strictly necessary for the issue handling, but useful)
+    public String getEmail() {
+        return this.email;
     }
 
 }
