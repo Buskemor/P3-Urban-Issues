@@ -36,16 +36,17 @@ public class Issue {
     }
 
     public void sendFeedbackToCitizen(Status status, Citizen wantsFeedback){
-        if (reportedBy.wantsFeedback())  //Ja, vi føler det næste step vil være at lave automatisk email, hvilket er lidt meget
-            if(status==Status.PENDING) {
-                System.out.println("We have received your submission");
-            }
-            else if (status==Status.IN_PROGRESS) {
-                System.out.println("We have started to work on your submission");
-            }
-            else if (status==Status.RESOLVED) {
-                System.out.println("Your submission has been resolved");
-            }
+        if (!reportedBy.wantsFeedback())//Ja, vi føler det næste step vil være at lave automatisk email, hvilket er lidt meget
+            return ;
+        if(status==Status.PENDING) {
+            System.out.println("We have received your submission");
+        }
+        if (status==Status.IN_PROGRESS) {
+            System.out.println("We have started to work on your submission");
+        }
+        if (status==Status.RESOLVED) {
+            System.out.println("Your submission has been resolved");
+        }
     }
 
     public Status changeStatus(Status status){
