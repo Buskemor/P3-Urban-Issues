@@ -19,10 +19,4 @@ public class Citizen {
     public boolean wantsFeedback() {
         return this.wantsFeedback;
     }
-
-    // Getter for the email (not strictly necessary for the issue handling, but useful)
-    public String getEmail() {
-        return this.email;
-    }
-
 }
