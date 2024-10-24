@@ -27,7 +27,6 @@ public class WhoScene {
         Label whoAreYou = new Label("Who are you?");
         whoAreYou.setStyle("-fx-font-size: 18px;");
 
-
         Button buttonCitizen = new Button("Citizen");
         buttonCitizen.setOnAction(e -> app.setScene(app.getSceneIssue()));
 
