@@ -1,60 +1,52 @@
 package Iter1;
 
 import javafx.application.Application;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
-
 
 public class UI2 extends Application {
 
-    Button button;
+    Stage stage;
+    Scene sceneWho, sceneIssue, sceneAdmin;
 
-    public static void main(String[] args){
+    public static void main(String[] args) {
         launch(args);
     }
 
-
     @Override
-    public void start(Stage primaryStage) throws Exception{
-        primaryStage.setTitle("Sej titel");
-        button = new Button();
-        button.setText("START!!!");
+    public void start(Stage primaryStage) throws Exception {
+        stage = primaryStage;
+        primaryStage.setTitle("Urban Issues");
 
-        button.setOnAction(e ->{
-            System.out.println("Du klikkede på knappen");
-            System.out.println("Wow!");
-        });
+        // Create instances of each scene class
+        WhoScene whoScene = new WhoScene(this);
+        IssueScene issueScene = new IssueScene(this);
+        AdminScene adminScene = new AdminScene(this);
 
-        StackPane layout = new StackPane();
-        layout.getChildren().add(button);
+        // Initialize scenes
+        sceneWho = whoScene.getScene();
+        sceneIssue = issueScene.getScene();
+        sceneAdmin = adminScene.getScene();
 
-        Scene scene = new Scene(layout, 300,250);
-        primaryStage.setScene(scene);
+        // Set the initial scene
+        primaryStage.setScene(sceneWho);
         primaryStage.show();
     }
 
+    // Method to switch scenes from other classes
+    public void setScene(Scene scene) {
+        stage.setScene(scene);
+    }
+
+    public Scene getSceneWho() {
+        return sceneWho;
+    }
+
+    public Scene getSceneIssue() {
+        return sceneIssue;
+    }
+
+    public Scene getSceneAdmin() {
+        return sceneAdmin;
+    }
 }
-
-
-
-/*
-public class UI2 extends Application {
-
-    @Override
-    public void start(Stage primaryStage) throws Exception{
-        Parent root = FXMLLoader.load(getClass().getResource("testUI.fxml"));
-        primaryStage.setTitle("Hello world");
-        primaryStage.setScene(new Scene(root, 300, 275));
-        primaryStage.show();
-    }
-
-    public static void main(String[] args){
-        launch(args);
-    }
-}*/
