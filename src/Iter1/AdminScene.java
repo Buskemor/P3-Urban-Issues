@@ -17,7 +17,7 @@ public class AdminScene {
     private void createScene() {
 
         StackPane layout = new StackPane();
-        scene = new Scene(layout, 700, 650);
+        scene = new Scene(layout, 700, 600);
     }
 
     public Scene getScene() {

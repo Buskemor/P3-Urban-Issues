@@ -4,10 +4,7 @@ import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
-import javafx.scene.layout.ColumnConstraints;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 
 import static java.awt.SystemColor.control;
 
@@ -44,6 +41,7 @@ public class IssueScene {
         Label categorylab= new Label("Category*:");
         categorylab.setStyle("-fx-font-size: 16px;");
         ComboBox<String> categoryBox = new ComboBox<>();
+        categoryBox.setPrefWidth(300);
 
         // Adding items to the ComboBox
         categoryBox.getItems().add("Road");
@@ -60,6 +58,7 @@ public class IssueScene {
         Label imagelab = new Label("Image:");
         imagelab.setStyle("-fx-font-size: 16px;");
 
+
         Label locationlab = new Label("Location of issue*:");
         locationlab.setStyle("-fx-font-size: 16px;");
         TextField locationtext = new TextField();
@@ -72,64 +71,72 @@ public class IssueScene {
         emaillab.setStyle("-fx-font-size: 16px;");
         TextField emailtext = new TextField();
 
-        /*HBox layoutname = new HBox(10); // 10px spacing between buttons
-        layoutname.getChildren().addAll(namelab, nametext);
-        layoutname.setAlignment(Pos.CENTER); // Center the buttons horizontally
-
-        HBox layoutcat = new HBox(10); // 10px spacing between buttons
-        layoutcat.getChildren().addAll(categorylab, categoryBox);
-        layoutcat.setAlignment(Pos.CENTER); // Center the buttons horizontally
-
-        HBox layoutdesc = new HBox(10); // 10px spacing between buttons
-        layoutdesc.getChildren().addAll(descriptionlab, descriptiontext);
-        layoutdesc.setAlignment(Pos.CENTER); // Center the buttons horizontally
-
-        //IMAGE TEXT
-
-        HBox layoutloc = new HBox(10); // 10px spacing between buttons
-        layoutloc.getChildren().addAll(locationlab, locationtext);
-        layoutloc.setAlignment(Pos.CENTER); // Center the buttons horizontally
-
-        HBox layoutfeed = new HBox(10); // 10px spacing between buttons
-        layoutfeed.getChildren().addAll(feedbacklab, feedbackBox);
-        layoutfeed.setAlignment(Pos.CENTER); // Center the buttons horizontally
-
-        HBox layoutemail = new HBox(10); // 10px spacing between buttons
-        layoutemail.getChildren().addAll(emaillab, emailtext);
-        layoutemail.setAlignment(Pos.CENTER); // Center the buttons horizontally*/
 
         Button submitknap= new Button("Submit");
+        submitknap.setOnAction(e -> {
+            //Retrieving data
+            String name = nametext.getText();
+            String category = categoryBox.getValue();
+            String description = descriptiontext.getText();
+            String location = locationtext.getText();
+            Boolean feedback = feedbackBox.isSelected();
+            String email = emailtext.getText();
 
 
+            // Check if required fields are filled
+            if (name.isEmpty() || category == null || description.isEmpty() || location.isEmpty()) {
+                // Alert user if any required field is missing
+                Alert alert = new Alert(Alert.AlertType.WARNING);
+                alert.setTitle("Missing Information");
+                alert.setHeaderText(null);
+                alert.setContentText("Please fill out the missing information.");
+                alert.showAndWait();
 
-        // Layout for Header and Separator
-        /*VBox headerLayout = new VBox(10); // 10px spacing
-        headerLayout.getChildren().addAll(header, separator, underoverskrift, layoutcat, layoutdesc, imagelab,layoutloc,layoutfeed,layoutemail, submitknap);
-        headerLayout.setPadding(new javafx.geometry.Insets(10, 0, 0, 0));
-        headerLayout.setAlignment(Pos.TOP_CENTER); // Centered at the top*/
+            } else {
+                // Print information to console
+                String finalname = name;
+                String finalcategory = category;
+                String finaldescription = description;
+                String finallocation = location;
+                Boolean finalfeedback = feedback;
+                String finalemail = email;
+
+                System.out.println(finalname);
+                System.out.println(finalcategory);
+                System.out.println(finaldescription);
+                System.out.println(finallocation);
+                System.out.println(finalfeedback);
+                System.out.println(finalemail);
+
+                // Exit application
+                javafx.application.Platform.exit();
+            }
+        });
 
         GridPane grid = new GridPane();
         grid.setGridLinesVisible(false);
 
-        grid.add(namelab,0,0,1,1);
-        grid.add(nametext,1,0,1,1);
+        grid.add(namelab,1,5,1,1);
+        grid.add(nametext,2,5,12,1);
 
-        grid.add(categorylab,0,1,1,1);
-        grid.add(categoryBox,1,1,1,1);
+        grid.add(categorylab,1,6,1,1);
+        grid.add(categoryBox,2,6,12,1);
 
-        grid.add(descriptionlab,0,2,1,1);
-        grid.add(descriptiontext,1,2,1,1);
+        grid.add(descriptionlab,1,7,1,1);
+        grid.add(descriptiontext,2,7,12,1);
 
-        grid.add(imagelab,0,3,1,1);
+        grid.add(imagelab,1,8,1,1);
 
-        grid.add(locationlab,0,4,1,1);
-        grid.add(locationtext,1,4,1,1);
+        grid.add(locationlab,1,9,1,1);
+        grid.add(locationtext,2,9,12,1);
 
-        grid.add(feedbacklab,0,5,1,1);
-        grid.add(feedbackBox,1,5,1,1);
+        grid.add(feedbacklab,1,10,1,1);
+        grid.add(feedbackBox,2,10,1,1);
 
-        grid.add(emaillab,0,6,1,1);
-        grid.add(emailtext,1,6,1,1);
+        grid.add(emaillab,1,11,1,1);
+        grid.add(emailtext,2,11,12,1);
+
+        grid.add(submitknap,7,15,1,1);
 
         grid.setHgap(20);
         grid.setVgap(10);
@@ -142,7 +149,7 @@ public class IssueScene {
         grid.getColumnConstraints().add(column1);
         grid.getColumnConstraints().add(column2);
 
-        column1.setPrefWidth(200);
+        column1.setPrefWidth(20);
 
 
         GridPane.setHalignment(namelab, HPos.RIGHT);
@@ -154,11 +161,22 @@ public class IssueScene {
         GridPane.setHalignment(emaillab, HPos.RIGHT);
 
 
+        VBox contentBox = new VBox(10,grid);
+        contentBox.setAlignment(Pos.TOP_CENTER);
 
+        VBox headerLayout = new VBox(10); // 10px spacing
+        headerLayout.getChildren().addAll(header, separator,overskrift, underoverskrift);
+        headerLayout.setPadding(new javafx.geometry.Insets(10, 0, 0, 0));
+        headerLayout.setAlignment(Pos.TOP_CENTER); // Centered at the top
+
+        BorderPane root = new BorderPane();
+        root.setTop(headerLayout);
+        BorderPane.setAlignment(header,Pos.CENTER);
+        root.setCenter(contentBox);
 
 
         // Create the Scene
-        scene = new Scene(grid, 700, 650);
+        scene = new Scene(root, 700, 600);
     }
 
     public Scene getScene() {

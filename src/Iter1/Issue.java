@@ -1,4 +1,5 @@
 package Iter1;
+
 import java.util.Date;
 
 
@@ -36,7 +37,7 @@ public class Issue {
     }
 
     public void sendFeedbackToCitizen(Status status, Citizen wantsFeedback){
-        if (!reportedBy.wantsFeedback())//Ja, vi føler det næste step vil være at lave automatisk email, hvilket er lidt meget
+        if (!reportedBy.wantsFeedback())        //Ja, vi føler det næste step vil være at lave automatisk email, hvilket er lidt meget
             return ;
         if(status==Status.PENDING) {
             System.out.println("We have received your submission");

@@ -1,6 +1,7 @@
 package Iter1;
 
 public class Citizen {
+
     private String email;
     private boolean wantsFeedback;
 
