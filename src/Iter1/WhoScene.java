@@ -22,7 +22,7 @@ public class WhoScene {
         overskrift.setStyle("-fx-font-size: 30px; -fx-font-weight: bold;");
 
         Label underOverskrift = new Label("''Your City, Your Voice, Your Impact''");
-        underOverskrift.setStyle("-fx-font-size: 20px; -fx-font-weight: normal;");
+        underOverskrift.setStyle("-fx-font-size: 20px;");
 
         Label whoAreYou = new Label("Who are you?");
         whoAreYou.setStyle("-fx-font-size: 18px;");

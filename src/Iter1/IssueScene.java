@@ -14,13 +14,14 @@ public class IssueScene {
     private UI2 app;
     private Scene scene;
 
+
     public IssueScene(UI2 app) {
         this.app = app;
         createScene();
     }
 
     private void createScene() {
-        Label header = new Label("Issue Reporting");
+        Label header = new Label("Urban Issue Reporting");
         header.setStyle("-fx-font-size: 28px; -fx-font-weight: bold;"); // Style the header
 
         // Create Separator
