@@ -1,9 +1,3 @@
-DBConnectorWIP is trying to make the code more managable by splitting it up.
-
-DBConnector is the working prototype. PROTOTYPE. It's unreadable code, but it works.
-
-------------------------------------------------------------------------------------
-
 To run this code, go to MySQL workbench and change your root password to: KENDATABASE123
 using the following SQL command:
 
@@ -14,7 +8,7 @@ IMPORTANT; when running multiple queries at once in MySQL workbench,
 deselect all text before pressing the 'lightning' button in the top left.
 
 Then, create a new schema called 'issuesdb', and run the following init SQL query:
-
+    
     CREATE TABLE locations (
     location_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     road VARCHAR(50) NOT NULL,

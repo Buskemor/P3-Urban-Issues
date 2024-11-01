@@ -1,10 +1,10 @@
 package database;
 
 public enum Category {
-    ROAD,
+    OTHER,
     VANDALISM,
     ELECTRICAL,
     WATER,
     OBSTRUCTION,
-    OTHER
+    ROAD
 }

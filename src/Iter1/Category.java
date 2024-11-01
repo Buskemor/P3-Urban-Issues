@@ -1,10 +1,10 @@
 package Iter1;
 
 public enum Category {
-    ROAD,
+    OTHER,
     VANDALISM,
     ELECTRICAL,
     WATER,
     OBSTRUCTION,
-    OTHER
+    ROAD
 }
