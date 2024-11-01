@@ -109,8 +109,8 @@ public class IssueScene {
                 System.out.println(finalfeedback);
                 System.out.println(finalemail);
 
-                // Exit application
-                javafx.application.Platform.exit();
+
+                app.setScene(app.getSceneConfirmation());
             }
         });
 

@@ -7,7 +7,7 @@ import javafx.stage.Stage;
 public class UI2 extends Application {
 
     Stage stage;
-    Scene sceneWho, sceneIssue, sceneAdmin;
+    Scene sceneWho, sceneIssue, sceneAdmin, sceneConfirmation;
 
     public static void main(String[] args) {
         launch(args);
@@ -22,11 +22,13 @@ public class UI2 extends Application {
         WhoScene whoScene = new WhoScene(this);
         IssueScene issueScene = new IssueScene(this);
         AdminScene adminScene = new AdminScene(this);
+        ConfirmationScene confirmationScene = new ConfirmationScene(this);
 
         // Initialize scenes
         sceneWho = whoScene.getScene();
         sceneIssue = issueScene.getScene();
         sceneAdmin = adminScene.getScene();
+        sceneConfirmation = confirmationScene.getScene();
 
         // Set the initial scene
         primaryStage.setScene(sceneWho);
@@ -49,4 +51,9 @@ public class UI2 extends Application {
     public Scene getSceneAdmin() {
         return sceneAdmin;
     }
+
+    public Scene getSceneConfirmation() {
+    return sceneConfirmation;
 }
+}
+
