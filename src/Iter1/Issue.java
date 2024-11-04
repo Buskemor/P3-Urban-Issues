@@ -5,27 +5,29 @@ import java.util.Date;
 
 public class Issue {
 
-    private String location;
+    private String road;
+    private int houseNumber;
     private String description;
     private Category category;
     private Status status;
     private Citizen reportedBy;
-    private Date date;
+//    private Date date;
 
 
-    public Issue(String location, String description, Category category, Citizen reportedBy){
-        this.location=location;
+
+    public Issue(String road, int houseNumber, String description, Category category, Citizen reportedBy){
+        this.road=road;
+        this.houseNumber = houseNumber;
         this.description=description;
         this.category=category;
         this.status=Status.PENDING;
         this.reportedBy=reportedBy;
-        this.date=new Date();
-
+//        this.date=new Date();
     }
 
     public static void main(String[] args) {
         Citizen citizen = new Citizen("JohnDoe@asdasd.dk", true);
-        Issue issue = new Issue("Park", "Broken pipe", Category.WATER, citizen);
+        Issue issue = new Issue("Park",10, "Broken pipe", Category.WATER, citizen);
 
         issue.sendFeedbackToCitizen(issue.status, issue.reportedBy);
 
@@ -78,5 +80,25 @@ public class Issue {
 
     }
 
+
+    public String getRoad() {
+        return this.road;
+    }
+
+    public int getHouseNumber() {
+        return this.houseNumber;
+    }
+
+    public String getDescription() {
+        return this.description;
+    }
+
+    public Category getCategory() {
+        return this.category;
+    }
+
+    public Citizen getReportedBy() {
+        return this.reportedBy;
+    }
 }
 

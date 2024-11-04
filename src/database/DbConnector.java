@@ -1,29 +1,28 @@
 package database;
 
-import Iter1.Status;
-
+//import Iter1.Status;
+import Iter1.*;
 import java.sql.*;
 import java.util.Date;
 
 
 public class DbConnector {
     public static void main(String[] args) {
-        String description = "jeg elsker molopods";
-        String email = "runebaton@gmail.com";
-        String road = "fortældem";
-        int houseNumber = 19;
-        Category category = Category.WATER;
+        Citizen james = new Citizen("notjames@chad.com", true);
+        Issue pcProblem = james.submitIssue("notgade",20, "jens er et problem", Category.OTHER);
 
-        DbConnector vind = new DbConnector(description,email,road,houseNumber,category);
+        DbConnector vind = new DbConnector(pcProblem);
+
+//        DbConnector vind = new DbConnector(description,email,road,houseNumber,category);
 
         vind.addIssueToDatabase();
-
+//
 //        vind.iterateStatus(2);
 //        vind.iterateStatus(5);
 //        vind.iterateStatus(5);
 
-        System.out.println();
-        System.out.println(vind.convertEnumToSQLId(Status.IN_PROGRESS));
+//        System.out.println();
+//        System.out.println(vind.convertEnumToSQLId(Status.IN_PROGRESS));
 
 
 //        vind.selectIssuesByCategory(Category.OBSTRUCTION);
@@ -41,7 +40,7 @@ public class DbConnector {
     private final int houseNumber;
     public int locationId;
 
-    public DbConnector(String description, String email, String road, int houseNumber, Category category) {
+    public DbConnector(Issue issue) {
         String url = "jdbc:mysql://localhost:3306/issuesdb";
         String username = "root";
         String password = "KENDATABASE123";
@@ -51,11 +50,11 @@ public class DbConnector {
         } catch (SQLException e) {
             System.out.println(e);
         }
-        this.description = description;
-        this.email = email;
-        this.road = road;
-        this.houseNumber = houseNumber;
-        this.category = category;
+        this.description = issue.getDescription();
+        this.email = issue.getReportedBy().getEmail();
+        this.road = issue.getRoad();
+        this.houseNumber = issue.getHouseNumber();
+        this.category = issue.getCategory();
     }
 
 
