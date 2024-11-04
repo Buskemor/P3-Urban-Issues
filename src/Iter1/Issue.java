@@ -49,6 +49,7 @@ public class Issue {
             System.out.println("Your submission has been resolved");
         }
     }
+
     public Status changeStatus(Status status){
         if (status==Status.PENDING) {
             status = status.IN_PROGRESS;
@@ -58,6 +59,12 @@ public class Issue {
         }
         return status;
     }
+
+    /*private void iterateStatus() {
+        if(this.status.ordinal()+1 > Status.values().length)
+            throw new RuntimeException("Attempted to iterate enum out of bounds");
+        this.status = Status.values()[this.status.ordinal()+1];
+    }*/
 
     public void archiveIssue(Issue issue){
 

@@ -1,43 +1,53 @@
 package database;
 
+import Iter1.Status;
+
 import java.sql.*;
 import java.util.Date;
 
 
-public class DBConnector {
+public class DbConnector {
     public static void main(String[] args) {
         String description = "jeg elsker molopods";
         String email = "runebaton@gmail.com";
-        String road = "myggegade";
+        String road = "fortældem";
         int houseNumber = 19;
         Category category = Category.WATER;
 
-        DBConnector vind = new DBConnector(description,email,road,houseNumber,category);
+        DbConnector vind = new DbConnector(description,email,road,houseNumber,category);
+
         vind.addIssueToDatabase();
+
+//        vind.iterateStatus(2);
+//        vind.iterateStatus(5);
+//        vind.iterateStatus(5);
+
+        System.out.println();
+        System.out.println(vind.convertEnumToSQLId(Status.IN_PROGRESS));
+
+
+//        vind.selectIssuesByCategory(Category.OBSTRUCTION);
     }
 
-    private String url = "jdbc:mysql://localhost:3306/issuesdb";
-    private String username = "root";
-    private String password = "KENDATABASE123";
     private Connection connection;
+    private Status status;
+    private final Category category;
 
-    private String description;
-    private String email;
-    private int citizenId = 0;
+    private final String description;
+    private final String email;
+    private int citizenId;
 
-    private String road;
-    private int houseNumber;
-    private int locationId = 0;
+    private final String road;
+    private final int houseNumber;
+    public int locationId;
 
-    private java.sql.Date date = new java.sql.Date(new Date().getTime());
-    private Category category;
-    private int categoryId = 0;
+    public DbConnector(String description, String email, String road, int houseNumber, Category category) {
+        String url = "jdbc:mysql://localhost:3306/issuesdb";
+        String username = "root";
+        String password = "KENDATABASE123";
 
-
-
-    public DBConnector(String description, String email, String road, int houseNumber, Category category) {
         try {
-            this.connection = DriverManager.getConnection(this.url, this.username, this.password);
+            this.connection = DriverManager.getConnection(url, username, password);
         } catch (SQLException e) {
             System.out.println(e);
         }
@@ -48,12 +58,103 @@ public class DBConnector {
         this.category = category;
     }
 
+
+
+    public void iterateStatus(int issueId) {
+//        if(this.status.ordinal()+1 > Status.values().length)
+//            throw new RuntimeException("Attempted to iterate enum out of bounds");
+//        this.status = Status.values()[this.status.ordinal()+1];
+        try {
+            PreparedStatement selectStatusQuery = connection.prepareStatement("SELECT status_id FROM issues WHERE issue_id = ?");
+            selectStatusQuery.setInt(1, issueId);
+            ResultSet selectStatusResult = selectStatusQuery.executeQuery();
+
+            int statusId = 0;
+            while(selectStatusResult.next()) {
+                statusId = selectStatusResult.getInt(1);
+            }
+            Status status = null;
+
+            switch (statusId) {
+                case 0:
+                    throw new RuntimeException("status id is 0");
+                case 1:
+                    status = Status.IN_PROGRESS;
+                    break;
+                case 2:
+                    status = Status.RESOLVED;
+                    break;
+                case 3:
+                    throw new RuntimeException("status is already resolved, cannot change it");
+            }
+
+            PreparedStatement updateIssueQuery = connection.prepareStatement("UPDATE issues SET status_id = ? WHERE issue_id = ?");
+            updateIssueQuery.setInt(1, convertEnumToSQLId(status));
+            updateIssueQuery.setInt(2, issueId);
+            updateIssueQuery.execute();
+
+        } catch (SQLException e) {
+            System.out.println(e);
+        }
+    }
+
+
+
+    public int[] selectIssuesByCategory(Category category) {
+        int categoryId = convertEnumToSQLId(category);
+        int amountOfIssues = getAmountOfIssuesInCategory(category, categoryId);
+
+        try {
+            PreparedStatement selectIssueIdsQuery = connection.prepareStatement(
+                    "SELECT issue_id FROM issues WHERE category_id = ?");
+            selectIssueIdsQuery.setInt(1, categoryId);
+            ResultSet issueIdsResult = selectIssueIdsQuery.executeQuery();
+
+            int[] issueIds = new int[amountOfIssues];
+            int index = 0;
+            System.out.print("issues ids of "+category+": ");
+            while(issueIdsResult.next()) {
+                issueIds[index] = issueIdsResult.getInt("issue_id");
+                System.out.print(issueIds[index]+", ");
+                index++;
+            }
+            System.out.println();
+            return issueIds;
+        } catch (SQLException e) {
+            System.out.println(e);
+        }
+        return new int[0];
+    }
+
+
+
+    private int getAmountOfIssuesInCategory(Category category, int categoryId) {
+        try {
+            PreparedStatement selectIssueIdCountQuery = connection.prepareStatement(
+                    "SELECT COUNT(issue_id) FROM issues WHERE category_id = ?");
+            selectIssueIdCountQuery.setInt(1, categoryId);
+            ResultSet issueIdCountResult = selectIssueIdCountQuery.executeQuery();
+
+            int amountOfIssues = 0;
+            while(issueIdCountResult.next()) {
+                amountOfIssues = issueIdCountResult.getInt(1);
+            }
+            System.out.println("There are " + amountOfIssues+" issues of category: " + category +",");
+            return amountOfIssues;
+        } catch (SQLException e) {
+            System.out.println(e);
+        }
+        return 0;
+    }
+
+
+
     public void addIssueToDatabase() {
         if(!areCategoriesValid())
             return;
 
-        citizenId = checkForSQLAttributeDuplicates("citizen");
-        locationId = checkForSQLAttributeDuplicates("location");
+        citizenId = checkIfAttributeExists("citizen");
+        locationId = checkIfAttributeExists("location");
         System.out.println("checked for duplicates");
 
         if(citizenId == 0)
@@ -62,15 +163,14 @@ public class DBConnector {
             locationId = insertUniqueSQLAttribute("location");
         System.out.println("added unique");
 
-        categoryId = convertCategoryEnumToSQLId(category);
-
-        insertIssueIntoTable();
+        insertIssueIntoTable(convertEnumToSQLId(category));
         System.out.println("inserted issues");
     }
 
 
+
     public boolean areCategoriesValid() {
-        try{
+        try {
             PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM categories");
             ResultSet resultSet = preparedStatement.executeQuery();
             int index = 0;
@@ -86,7 +186,6 @@ public class DBConnector {
                 }
                 index++;
             }
-
         } catch (SQLException e) {
             System.out.println(e);
         }
@@ -97,7 +196,7 @@ public class DBConnector {
 
 
 
-    public int checkForSQLAttributeDuplicates(String attribute) {
+    public int checkIfAttributeExists(String attribute) {
 //        String table = attribute + "s";
         try {
             ResultSet resultSet = null;
@@ -163,26 +262,19 @@ public class DBConnector {
 
 
 
-    public int convertCategoryEnumToSQLId(Category category) {
-        int index = 1;
-        for(Category categoryElem : Category.values()) {
-            if(categoryElem.equals(category)) {
-                return index;
-            }
-            index++;
-        }
-        return 0;
+    public int convertEnumToSQLId(Enum<?> enumeration) {
+        return enumeration.ordinal() + 1;
     }
 
 
 
-    private void insertIssueIntoTable() {
+    private void insertIssueIntoTable(int categoryId) {
         try {
 //            insert into issues table
             PreparedStatement insertIssueQuery = connection.prepareStatement(
             "INSERT INTO issues (date, description, category_id, status_id, location_id, citizen_id)"
                 +"VALUES(?, ?, ?, ?, ?, ?)");
-            insertIssueQuery.setDate(1, date); //date
+            insertIssueQuery.setDate(1, new java.sql.Date(new Date().getTime())); //date
             insertIssueQuery.setString(2,description); //description
             insertIssueQuery.setInt(3,categoryId); //category
             insertIssueQuery.setInt(4, 1); //status (CONSTANT)
