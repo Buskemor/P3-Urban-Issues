@@ -2,6 +2,14 @@
   <library name="lib">
     <CLASSES>
       <root url="jar://$PROJECT_DIR$/libs/mysql-connector-j-9.1.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/libs/javafx-sdk-21.0.5/lib/javafx.web.jar!/" />
+      <root url="jar://$PROJECT_DIR$/libs/javafx-sdk-21.0.5/lib/javafx.media.jar!/" />
+      <root url="jar://$PROJECT_DIR$/libs/javafx-sdk-21.0.5/lib/javafx.swing.jar!/" />
+      <root url="jar://$PROJECT_DIR$/libs/javafx-sdk-21.0.5/lib/javafx.graphics.jar!/" />
+      <root url="jar://$PROJECT_DIR$/libs/javafx-sdk-21.0.5/lib/javafx.fxml.jar!/" />
+      <root url="jar://$PROJECT_DIR$/libs/javafx-sdk-21.0.5/lib/javafx.controls.jar!/" />
+      <root url="jar://$PROJECT_DIR$/libs/javafx-sdk-21.0.5/lib/javafx.base.jar!/" />
+      <root url="jar://$PROJECT_DIR$/libs/javafx-sdk-21.0.5/lib/javafx-swt.jar!/" />
     </CLASSES>
     <JAVADOC />
     <SOURCES />
