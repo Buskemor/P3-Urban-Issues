@@ -1,35 +1,15 @@
 package database;
 
-import Iter1.Category;
-import Iter1.Citizen;
-import Iter1.Issue;
-import Iter1.Status;
+import Iter1.*;
 
 import java.sql.*;
 
 public class DbManager {
     public static void main(String[] args) {
-//        new DbManager().selectIssuesByCategory(Category.ELECTRICAL);
-//        new DbManager().convertSqlIdToEnum(10,Status.PENDING);
-
         DbManager ta = new DbManager();
-
-        int[] issueIds = ta.selectIssuesByCategory(Category.ELECTRICAL);
-
-        for(int i = 0; i < issueIds.length; ++i) {
-            ta.getStatusOfIssue(issueIds[i]);
-            System.out.println(ta.getStatusOfIssue(issueIds[i]));
-        }
-
-//        System.out.println(ta.getStatusOfIssue(1));
-
     }
 
-
-
     private Connection connection;
-
-
 
     public DbManager() {
         String url = "jdbc:mysql://localhost:3306/issuesdb";
@@ -46,16 +26,7 @@ public class DbManager {
         return enumeration.ordinal() + 1;
     }
 
-//    public void convertSqlIdToEnum(int id, Enum<?> enumeration) {
-////        System.out.println(enumeration.getClass());
-////        System.out.println(enumeration.name());
-//        enumeration.
-//    }
-
     public void iterateStatus(int issueId) {
-//        if(this.status.ordinal()+1 > Status.values().length)
-//            throw new RuntimeException("Attempted to iterate enum out of bounds");
-//        this.status = Status.values()[this.status.ordinal()+1];
         try {
             PreparedStatement selectStatusQuery = connection.prepareStatement("SELECT status_id FROM issues WHERE issue_id = ?");
             selectStatusQuery.setInt(1, issueId);
@@ -85,22 +56,15 @@ public class DbManager {
             updateIssueQuery.setInt(2, issueId);
             updateIssueQuery.execute();
 
+            SendFeedback.sendFeedbackToCitizen(status, new Citizen("PLACEHOLDER@GMAIL.COM",true));
         } catch (SQLException e) {
             System.out.println(e);
         }
     }
 
 
-//    public int[] selectAllIssues() {
-//        try {
-//
-//        } catch ()
-//    }
-
-
-
     public int[] selectIssuesByCategory(Category category) {
-        int amountOfIssues = getAmountOfIssuesInCategory(category);
+        int amountOfIssues = countIssuesInCategory(category);
 
         try {
             PreparedStatement selectIssueIdsQuery = connection.prepareStatement(
@@ -126,7 +90,7 @@ public class DbManager {
 
 
 
-    private int getAmountOfIssuesInCategory(Category category) {
+    private int countIssuesInCategory(Category category) {
         try {
             PreparedStatement selectIssueIdCountQuery = connection.prepareStatement(
                     "SELECT COUNT(issue_id) FROM issues WHERE category_id = ?");
@@ -147,19 +111,59 @@ public class DbManager {
 
 
 
-    private String getRoadOfIssue(int issueId) {
-        return "";
+    public String fetchIssueRoad(int issueId) {
+        try {
+            PreparedStatement selectRoadQuery = connection.prepareStatement(
+                    "SELECT road FROM issues " +
+                        "INNER JOIN locations ON locations.location_id = issues.location_id " +
+                        "WHERE issue_id = ?");
+            selectRoadQuery.setInt(1, issueId);
+            ResultSet selectRoadResult = selectRoadQuery.executeQuery();
+
+            while(selectRoadResult.next()) {
+                return selectRoadResult.getString(1);
+            }
+        } catch (SQLException e) {
+            System.out.println(e);
+        }
+        throw new RuntimeException("road couldn't be determined");
     }
 
-    private int getHouseNumberOfIssue(int issueId) {
-        return 0;
+    public int fetchIssueHouseNumber(int issueId) {
+        try {
+            PreparedStatement selectHouseNrQuery = connection.prepareStatement(
+                    "SELECT housenumber FROM issues " +
+                        "INNER JOIN locations ON locations.location_id = issues.location_id " +
+                        "WHERE issue_id = ?");
+            selectHouseNrQuery.setInt(1, issueId);
+            ResultSet selectHouseNrResult = selectHouseNrQuery.executeQuery();
+
+            while(selectHouseNrResult.next()) {
+                return selectHouseNrResult.getInt(1);
+            }
+        } catch (SQLException e) {
+            System.out.println(e);
+        }
+        throw new RuntimeException("housenumber couldn't be determined");
     }
 
-    private String getDescriptionOfIssue(int issueId) {
-        return "";
+    public String fetchIssueDescription(int issueId) {
+        try {
+            PreparedStatement selectDescriptionQuery = connection.prepareStatement(
+                    "SELECT description FROM issues WHERE issue_id = ?");
+            selectDescriptionQuery.setInt(1, issueId);
+            ResultSet selectStatusResult = selectDescriptionQuery.executeQuery();
+
+            while(selectStatusResult.next()) {
+                return selectStatusResult.getString(1);
+            }
+        } catch (SQLException e) {
+            System.out.println(e);
+        }
+        throw new RuntimeException("description couldn't be determined");
     }
 
-    private Status getStatusOfIssue(int issueId) {
+    public Status fetchIssueStatus(int issueId) {
         try {
             PreparedStatement selectStatusQuery = connection.prepareStatement(
                     "SELECT status_id FROM issues WHERE issue_id = ?");
@@ -170,7 +174,7 @@ public class DbManager {
             while(selectStatusResult.next()) {
                 statusId = selectStatusResult.getInt(1);
             }
-            switch (statusId) { // scuffed, might fix later
+            switch (statusId) {
                 case 1:
                     return Status.PENDING;
                 case 2:
@@ -184,7 +188,40 @@ public class DbManager {
         throw new RuntimeException("status couldn't be determined");
     }
 
-    private Citizen getCitizenOfIssue(int issueId) {
-        return new Citizen("yes@no", true);
+    public String fetchIssueEmail(int issueId) {
+        try {
+            PreparedStatement selectEmailQuery = connection.prepareStatement(
+                    "SELECT email FROM issues " +
+                        "INNER JOIN citizens ON citizens.citizen_id = issues.citizen_id " +
+                        "WHERE issue_id = ?");
+            selectEmailQuery.setInt(1, issueId);
+            ResultSet selectEmailResult = selectEmailQuery.executeQuery();
+
+            while(selectEmailResult.next()) {
+                return selectEmailResult.getString(1);
+            }
+
+        } catch (SQLException e) {
+            System.out.println(e);
+        }
+        throw new RuntimeException("issue doesn't have an email");
+    }
+
+    public boolean doesIssueHaveEmail(int issueId) {
+        try {
+            PreparedStatement selectEmailQuery = connection.prepareStatement(
+                    "SELECT email FROM issues " +
+                        "INNER JOIN citizens ON citizens.citizen_id = issues.citizen_id " +
+                        "WHERE issue_id = ?");
+            selectEmailQuery.setInt(1, issueId);
+            ResultSet selectEmailResult = selectEmailQuery.executeQuery();
+            while(selectEmailResult.next()) {
+                return true;
+            }
+            return false;
+        } catch(SQLException e) {
+            System.out.println(e);
+        }
+        throw new RuntimeException("failed to check if issue has an email");
     }
 }

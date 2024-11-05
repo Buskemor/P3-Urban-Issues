@@ -111,7 +111,6 @@ public class IssueScene {
                         System.out.println(Category.values()[i]);
                         finalCategory=Category.values()[i];
                     }
-
                 }
 
 

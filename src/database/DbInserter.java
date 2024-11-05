@@ -9,8 +9,7 @@ import java.util.Date;
 
 
 public class DbInserter {
-    public static void main(String[] args) {
-    }
+
 
 
     private Connection connection;
