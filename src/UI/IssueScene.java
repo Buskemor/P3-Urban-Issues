@@ -1,4 +1,7 @@
 package UI;
+import Iter1.Category;
+import Iter1.Citizen;
+import Iter1.Issue;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
@@ -33,14 +36,10 @@ public class IssueScene {
         Label underoverskrift = new Label("Please describe the issue below:");
         underoverskrift.setStyle("-fx-font-size: 16px;");
 
-        Label namelab = new Label("Name*:");
-        namelab.setStyle("-fx-font-size: 16px;");
-        TextField nametext = new TextField();
-
         Label categorylab= new Label("Category*:");
         categorylab.setStyle("-fx-font-size: 16px;");
         ComboBox<String> categoryBox = new ComboBox<>();
-        categoryBox.setPrefWidth(300);
+        categoryBox.setPrefWidth(400);
 
         // Adding items to the ComboBox
         categoryBox.getItems().add("Road");
@@ -62,6 +61,10 @@ public class IssueScene {
         locationlab.setStyle("-fx-font-size: 16px;");
         TextField locationtext = new TextField();
 
+        Label numberlab = new Label("Nr*:");
+        descriptionlab.setStyle("-fx-font-size: 16px;");
+        TextField numbertext = new TextField();
+
         Label feedbacklab= new Label("Receive feedback?:");
         feedbacklab.setStyle("-fx-font-size: 16px;");
         CheckBox feedbackBox = new CheckBox();
@@ -74,38 +77,57 @@ public class IssueScene {
         Button submitknap= new Button("Submit");
         submitknap.setOnAction(e -> {
             //Retrieving data
-            String name = nametext.getText();
             String category = categoryBox.getValue();
             String description = descriptiontext.getText();
             String location = locationtext.getText();
             Boolean feedback = feedbackBox.isSelected();
             String email = emailtext.getText();
+            String houseNumber = numbertext.getText();
+
 
 
             // Check if required fields are filled
-            if (name.isEmpty() || category == null || description.isEmpty() || location.isEmpty()) {
+            if (category == null || description.isEmpty() || location.isEmpty() || !houseNumber.matches("\\d+")) {
                 // Alert user if any required field is missing
                 Alert alert = new Alert(Alert.AlertType.WARNING);
                 alert.setTitle("Missing Information");
                 alert.setHeaderText(null);
-                alert.setContentText("Please fill out the missing information.");
+                alert.setContentText("Please fill out the missing information. Nr needs to be ONLY a number, no letters");
                 alert.showAndWait();
 
             } else {
                 // Print information to console
-                String finalname = name;
-                String finalcategory = category;
+                int finalhousenumber = Integer.parseInt(houseNumber);
+
+                String tempcategory = category.toUpperCase();
                 String finaldescription = description;
                 String finallocation = location;
                 Boolean finalfeedback = feedback;
                 String finalemail = email;
+                Category finalCategory = null;
 
-                System.out.println(finalname);
-                System.out.println(finalcategory);
+                for(int i = 0; i < Category.values().length; ++i) {
+                    if(Category.values()[i] == Category.valueOf(tempcategory)) {
+                        System.out.println(Category.values()[i]);
+                        finalCategory=Category.values()[i];
+                    }
+
+                }
+
+
+                System.out.println(finalCategory);
                 System.out.println(finaldescription);
                 System.out.println(finallocation);
                 System.out.println(finalfeedback);
                 System.out.println(finalemail);
+                System.out.println(finalhousenumber);
+
+                if (feedbackBox.isSelected()){
+                    new Issue(finallocation,finalhousenumber,finaldescription, finalCategory,new Citizen(finalemail,true));
+                }
+                else {
+                    new Issue(finallocation,finalhousenumber,finaldescription,finalCategory);
+                }
 
 
                 app.setScene(app.getSceneConfirmation());
@@ -115,29 +137,30 @@ public class IssueScene {
         GridPane grid = new GridPane();
         grid.setGridLinesVisible(false);
 
-        grid.add(namelab,1,5,1,1);
-        grid.add(nametext,2,5,12,1);
 
         grid.add(categorylab,1,6,1,1);
-        grid.add(categoryBox,2,6,12,1);
+        grid.add(categoryBox,2,6,7,1);
 
         grid.add(descriptionlab,1,7,1,1);
-        grid.add(descriptiontext,2,7,12,1);
+        grid.add(descriptiontext,2,7,7,1);
 
         grid.add(imagelab,1,8,1,1);
 
         grid.add(locationlab,1,9,1,1);
-        grid.add(locationtext,2,9,12,1);
+        grid.add(locationtext,2,9,5,1);
+
+        grid.add(numberlab,7,9,1,1);
+        grid.add(numbertext,8,9,1,1);
 
         grid.add(feedbacklab,1,10,1,1);
         grid.add(feedbackBox,2,10,1,1);
 
         grid.add(emaillab,1,11,1,1);
-        grid.add(emailtext,2,11,12,1);
+        grid.add(emailtext,2,11,7,1);
 
         grid.add(submitknap,7,15,1,1);
 
-        grid.setHgap(20);
+        grid.setHgap(10);
         grid.setVgap(10);
 
         grid.setPadding(new Insets(10,10,10,10));
@@ -151,8 +174,8 @@ public class IssueScene {
         column1.setPrefWidth(20);
 
 
-        GridPane.setHalignment(namelab, HPos.RIGHT);
         GridPane.setHalignment(categorylab, HPos.RIGHT);
+        GridPane.setHalignment(numberlab, HPos.RIGHT);
         GridPane.setHalignment(descriptionlab, HPos.RIGHT);
         GridPane.setHalignment(imagelab, HPos.RIGHT);
         GridPane.setHalignment(locationlab, HPos.RIGHT);
@@ -165,7 +188,7 @@ public class IssueScene {
 
         VBox headerLayout = new VBox(10); // 10px spacing
         headerLayout.getChildren().addAll(header, separator,overskrift, underoverskrift);
-        headerLayout.setPadding(new javafx.geometry.Insets(10, 0, 0, 0));
+        headerLayout.setPadding(new Insets(10, 0, 0, 0));
         headerLayout.setAlignment(Pos.TOP_CENTER); // Centered at the top
 
         BorderPane root = new BorderPane();

@@ -2,15 +2,16 @@ package database;
 
 //import Iter1.Status;
 import Iter1.*;
+import UI.UI2;
+
 import java.sql.*;
 import java.util.Date;
 
 
 public class DbInserter {
     public static void main(String[] args) {
-       new Issue("taplace",10,"um ta ok?", Category.ELECTRICAL);
-       new Issue("small",50,"TINY PLACE", Category.WATER, new Citizen("Chad@gmail.com", true));
     }
+
 
     private Connection connection;
     private Category category;
