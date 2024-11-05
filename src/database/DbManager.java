@@ -14,7 +14,14 @@ public class DbManager {
 
         DbManager ta = new DbManager();
 
-        System.out.println(ta.getStatusOfIssue(1));
+        int[] issueIds = ta.selectIssuesByCategory(Category.ELECTRICAL);
+
+        for(int i = 0; i < issueIds.length; ++i) {
+            ta.getStatusOfIssue(issueIds[i]);
+            System.out.println(ta.getStatusOfIssue(issueIds[i]));
+        }
+
+//        System.out.println(ta.getStatusOfIssue(1));
 
     }
 
@@ -84,6 +91,13 @@ public class DbManager {
     }
 
 
+//    public int[] selectAllIssues() {
+//        try {
+//
+//        } catch ()
+//    }
+
+
 
     public int[] selectIssuesByCategory(Category category) {
         int amountOfIssues = getAmountOfIssuesInCategory(category);
@@ -143,10 +157,6 @@ public class DbManager {
 
     private String getDescriptionOfIssue(int issueId) {
         return "";
-    }
-
-    private Category getCategoryOfIssue(int issueId) {
-        return Category.OTHER;
     }
 
     private Status getStatusOfIssue(int issueId) {

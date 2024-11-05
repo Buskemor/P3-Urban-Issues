@@ -12,8 +12,6 @@ public class Issue {
     private Status status;
     private Citizen reportedBy;
 
-
-
     public Issue(String road, int houseNumber, String description, Category category, Citizen reportedBy){
         this.road=road;
         this.houseNumber = houseNumber;
@@ -111,4 +109,3 @@ public class Issue {
         return this.reportedBy;
     }
 }
-
