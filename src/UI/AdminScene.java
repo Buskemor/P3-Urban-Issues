@@ -1,4 +1,4 @@
-package Iter1;
+package UI;
 
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -6,7 +6,6 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 
 public class AdminScene {

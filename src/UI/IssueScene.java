@@ -1,12 +1,10 @@
-package Iter1;
+package UI;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
-
-import static java.awt.SystemColor.control;
 
 
 public class IssueScene {

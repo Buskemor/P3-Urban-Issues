@@ -1,6 +1,6 @@
 package Iter1;
 
-import java.util.Date;
+import database.DbInserter;
 
 
 public class Issue {
@@ -11,7 +11,6 @@ public class Issue {
     private Category category;
     private Status status;
     private Citizen reportedBy;
-//    private Date date;
 
 
 
@@ -22,7 +21,18 @@ public class Issue {
         this.category=category;
         this.status=Status.PENDING;
         this.reportedBy=reportedBy;
-//        this.date=new Date();
+
+        new DbInserter(this).addIssueToDatabase();
+    }
+
+    public Issue(String road, int houseNumber, String description, Category category){
+        this.road=road;
+        this.houseNumber = houseNumber;
+        this.description=description;
+        this.category=category;
+        this.status=Status.PENDING;
+
+        new DbInserter(this).addIssueToDatabase();
     }
 
     public static void main(String[] args) {

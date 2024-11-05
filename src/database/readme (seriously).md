@@ -1,3 +1,5 @@
+DbInserter runs when an instance of Issue is created.
+
 To run this code, go to MySQL workbench and change your root password to: KENDATABASE123
 using the following SQL command:
 
@@ -54,7 +56,7 @@ Then, create a new schema called 'issuesdb', and run the following init SQL quer
 
 ------------------------------------------------------------------------------------
 
-To reset the db, run this query, then run the init query again.
+To reset the db, run this query, then run the init query again (you might have to disable safe mode).
 
     DROP TABLE issues, citizens, locations, categories, statuses;
 

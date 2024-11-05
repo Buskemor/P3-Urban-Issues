@@ -1,4 +1,4 @@
-package Iter1;
+package UI;
 
 import javafx.application.Application;
 import javafx.scene.Scene;

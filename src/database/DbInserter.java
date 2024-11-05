@@ -6,41 +6,24 @@ import java.sql.*;
 import java.util.Date;
 
 
-public class DbConnector {
+public class DbInserter {
     public static void main(String[] args) {
-        Citizen james = new Citizen("notjames@chad.com", true);
-        Issue pcProblem = james.submitIssue("notgade",20, "jens er et problem", Category.OTHER);
-
-        DbConnector vind = new DbConnector(pcProblem);
-
-//        DbConnector vind = new DbConnector(description,email,road,houseNumber,category);
-
-        vind.addIssueToDatabase();
-//
-//        vind.iterateStatus(2);
-//        vind.iterateStatus(5);
-//        vind.iterateStatus(5);
-
-//        System.out.println();
-//        System.out.println(vind.convertEnumToSQLId(Status.IN_PROGRESS));
-
-
-//        vind.selectIssuesByCategory(Category.OBSTRUCTION);
+//        new Issue("taplace",10,"um ta ok?", Category.ELECTRICAL);
+//        new Issue("small",50,"TINY PLACE", Category.WATER, new Citizen("Chad@gmail.com", true));
     }
 
     private Connection connection;
-    private Status status;
-    private final Category category;
+    private Category category;
 
-    private final String description;
-    private final String email;
+    private String description;
+    private String email;
     private int citizenId;
 
-    private final String road;
-    private final int houseNumber;
+    private String road;
+    private int houseNumber;
     public int locationId;
 
-    public DbConnector(Issue issue) {
+    public DbInserter(Issue issue) {
         String url = "jdbc:mysql://localhost:3306/issuesdb";
         String username = "root";
         String password = "KENDATABASE123";
@@ -51,99 +34,11 @@ public class DbConnector {
             System.out.println(e);
         }
         this.description = issue.getDescription();
-        this.email = issue.getReportedBy().getEmail();
+        if(issue.getReportedBy() != null)
+            this.email = issue.getReportedBy().getEmail();
         this.road = issue.getRoad();
         this.houseNumber = issue.getHouseNumber();
         this.category = issue.getCategory();
-    }
-
-
-
-    public void iterateStatus(int issueId) {
-//        if(this.status.ordinal()+1 > Status.values().length)
-//            throw new RuntimeException("Attempted to iterate enum out of bounds");
-//        this.status = Status.values()[this.status.ordinal()+1];
-        try {
-            PreparedStatement selectStatusQuery = connection.prepareStatement("SELECT status_id FROM issues WHERE issue_id = ?");
-            selectStatusQuery.setInt(1, issueId);
-            ResultSet selectStatusResult = selectStatusQuery.executeQuery();
-
-            int statusId = 0;
-            while(selectStatusResult.next()) {
-                statusId = selectStatusResult.getInt(1);
-            }
-            Status status = null;
-
-            switch (statusId) {
-                case 0:
-                    throw new RuntimeException("status id is 0");
-                case 1:
-                    status = Status.IN_PROGRESS;
-                    break;
-                case 2:
-                    status = Status.RESOLVED;
-                    break;
-                case 3:
-                    throw new RuntimeException("status is already resolved, cannot change it");
-            }
-
-            PreparedStatement updateIssueQuery = connection.prepareStatement("UPDATE issues SET status_id = ? WHERE issue_id = ?");
-            updateIssueQuery.setInt(1, convertEnumToSQLId(status));
-            updateIssueQuery.setInt(2, issueId);
-            updateIssueQuery.execute();
-
-        } catch (SQLException e) {
-            System.out.println(e);
-        }
-    }
-
-
-
-    public int[] selectIssuesByCategory(Category category) {
-        int categoryId = convertEnumToSQLId(category);
-        int amountOfIssues = getAmountOfIssuesInCategory(category, categoryId);
-
-        try {
-            PreparedStatement selectIssueIdsQuery = connection.prepareStatement(
-                    "SELECT issue_id FROM issues WHERE category_id = ?");
-            selectIssueIdsQuery.setInt(1, categoryId);
-            ResultSet issueIdsResult = selectIssueIdsQuery.executeQuery();
-
-            int[] issueIds = new int[amountOfIssues];
-            int index = 0;
-            System.out.print("issues ids of "+category+": ");
-            while(issueIdsResult.next()) {
-                issueIds[index] = issueIdsResult.getInt("issue_id");
-                System.out.print(issueIds[index]+", ");
-                index++;
-            }
-            System.out.println();
-            return issueIds;
-        } catch (SQLException e) {
-            System.out.println(e);
-        }
-        return new int[0];
-    }
-
-
-
-    private int getAmountOfIssuesInCategory(Category category, int categoryId) {
-        try {
-            PreparedStatement selectIssueIdCountQuery = connection.prepareStatement(
-                    "SELECT COUNT(issue_id) FROM issues WHERE category_id = ?");
-            selectIssueIdCountQuery.setInt(1, categoryId);
-            ResultSet issueIdCountResult = selectIssueIdCountQuery.executeQuery();
-
-            int amountOfIssues = 0;
-            while(issueIdCountResult.next()) {
-                amountOfIssues = issueIdCountResult.getInt(1);
-            }
-            System.out.println("There are " + amountOfIssues+" issues of category: " + category +",");
-            return amountOfIssues;
-        } catch (SQLException e) {
-            System.out.println(e);
-        }
-        return 0;
     }
 
 
@@ -152,23 +47,23 @@ public class DbConnector {
         if(!areCategoriesValid())
             return;
 
+        System.out.println("Checking if attribute id's already exist in the db:");
         citizenId = checkIfAttributeExists("citizen");
         locationId = checkIfAttributeExists("location");
-        System.out.println("checked for duplicates");
 
-        if(citizenId == 0)
+        System.out.println("Adding unique attributes to tables..");
+        if(citizenId == 0 && email != null)
             citizenId = insertUniqueSQLAttribute("citizen");
         if(locationId == 0)
             locationId = insertUniqueSQLAttribute("location");
-        System.out.println("added unique");
 
-        insertIssueIntoTable(convertEnumToSQLId(category));
-        System.out.println("inserted issues");
+        System.out.println("Inserting into issues table..");
+        insertIssueIntoTable(new DbManager().convertEnumToSQLId(category));
     }
 
 
 
-    public boolean areCategoriesValid() {
+    public boolean areCategoriesValid() { //could argue that this should be moved to DbManager
         try {
             PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM categories");
             ResultSet resultSet = preparedStatement.executeQuery();
@@ -215,7 +110,7 @@ public class DbConnector {
             }
 
             while(resultSet.next()) {
-                System.out.println(attribute +" exists as "+attribute+"_id: " + resultSet.getInt(attribute+"_id"));
+                System.out.println("    "+attribute +" already exists as "+attribute+"_id: " + resultSet.getInt(attribute+"_id"));
                 return resultSet.getInt(attribute+"_id");
             }
         } catch (SQLException e) {
@@ -261,15 +156,8 @@ public class DbConnector {
 
 
 
-    public int convertEnumToSQLId(Enum<?> enumeration) {
-        return enumeration.ordinal() + 1;
-    }
-
-
-
     private void insertIssueIntoTable(int categoryId) {
         try {
-//            insert into issues table
             PreparedStatement insertIssueQuery = connection.prepareStatement(
             "INSERT INTO issues (date, description, category_id, status_id, location_id, citizen_id)"
                 +"VALUES(?, ?, ?, ?, ?, ?)");
@@ -278,11 +166,17 @@ public class DbConnector {
             insertIssueQuery.setInt(3,categoryId); //category
             insertIssueQuery.setInt(4, 1); //status (CONSTANT)
             insertIssueQuery.setInt(5,locationId); //location
-            insertIssueQuery.setInt(6, citizenId); //citizenId
+            if (citizenId == 0) {
+                insertIssueQuery.setNull(6, Types.NULL); //citizenId
+            } else {
+                insertIssueQuery.setInt(6, citizenId);
+            }
 
             insertIssueQuery.execute();
-            System.out.println("Issue inserted into issues table successfully.");
 
+            System.out.println("Issue inserted into issues table successfully.");
+            System.out.println();
+            System.out.println();
         } catch (SQLException e) {
             System.out.println(e);
         }

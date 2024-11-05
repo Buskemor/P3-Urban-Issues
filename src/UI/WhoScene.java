@@ -1,4 +1,4 @@
-package Iter1;
+package UI;
 
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
