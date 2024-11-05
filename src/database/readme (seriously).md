@@ -3,14 +3,19 @@ DbInserter runs when an instance of Issue is created.
 To run this code, go to MySQL workbench and change your root password to: KENDATABASE123
 using the following SQL command:
 
-    ALTER USER 'root'@'%' IDENTIFIED BY 'KENDATABASE123';
+    ALTER USER 'root'@'localhost' IDENTIFIED BY 'KENDATABASE123';
 
 
 IMPORTANT; when running multiple queries at once in MySQL workbench,
-deselect all text before pressing the 'lightning' button in the top left.
+deselect all text before pressing the 'lightning' button in the top left. (by pressing outside the code)
+(for instance click on the schema)
 
 Then, create a new schema called 'issuesdb', and run the following init SQL query:
-    
+to do this... click on schema (bottom left) then rightclick, then create schema, then name it 'issuesdb'
+then click apply, then apply, then finish.
+After make sure u are working in the schema by double clicking on it.
+and run the following init SQL query:
+
     CREATE TABLE locations (
     location_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     road VARCHAR(50) NOT NULL,
@@ -67,5 +72,5 @@ To select relevant parts of the database:
     INNER JOIN locations ON locations.location_id = issues.location_id
     INNER JOIN statuses ON statuses.status_id = issues.status_id
     INNER JOIN categories ON categories.category_id = issues.category_id
-    INNER JOIN citizens ON citizens.citizen_id = issues.citizen_id
+    LEFT OUTER JOIN citizens ON citizens.citizen_id = issues.citizen_id
     ORDER BY issue_id;
