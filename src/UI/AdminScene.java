@@ -123,7 +123,7 @@ public class AdminScene {
         // Add each category box to the main container
 
         GridPane grid = new GridPane();
-        grid.setGridLinesVisible(true);
+        grid.setGridLinesVisible(false);
 
         grid.add(issueCatlab,1,1,1,1);
         grid.add(categorylab,2,1,1,1);

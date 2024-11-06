@@ -57,7 +57,7 @@ public class IssueScene {
         imagelab.setStyle("-fx-font-size: 16px;");
 
 
-        Label locationlab = new Label("Location of issue*:");
+        Label locationlab = new Label("Road Name*:");
         locationlab.setStyle("-fx-font-size: 16px;");
         TextField locationtext = new TextField();
 
@@ -100,32 +100,31 @@ public class IssueScene {
                 int finalhousenumber = Integer.parseInt(houseNumber);
 
                 String tempcategory = category.toUpperCase();
-                String finaldescription = description;
-                String finallocation = location;
-                Boolean finalfeedback = feedback;
-                String finalemail = email;
                 Category finalCategory = null;
 
                 for(int i = 0; i < Category.values().length; ++i) {
                     if(Category.values()[i] == Category.valueOf(tempcategory)) {
                         System.out.println(Category.values()[i]);
                         finalCategory=Category.values()[i];
+                        break;
                     }
                 }
 
 
                 System.out.println(finalCategory);
-                System.out.println(finaldescription);
-                System.out.println(finallocation);
-                System.out.println(finalfeedback);
-                System.out.println(finalemail);
+                System.out.println(description);
+                System.out.println(location);
+                System.out.println(feedback);
+                System.out.println(email);
                 System.out.println(finalhousenumber);
 
+
+
                 if (feedbackBox.isSelected()){
-                    new Issue(finallocation,finalhousenumber,finaldescription, finalCategory,new Citizen(finalemail,true));
+                    new Issue(location,finalhousenumber,description, finalCategory,new Citizen(email,true));
                 }
                 else {
-                    new Issue(finallocation,finalhousenumber,finaldescription,finalCategory);
+                    new Issue(location,finalhousenumber,description,finalCategory);
                 }
 
 
@@ -190,8 +189,10 @@ public class IssueScene {
         headerLayout.setPadding(new Insets(10, 0, 0, 0));
         headerLayout.setAlignment(Pos.TOP_CENTER); // Centered at the top
 
+
         BorderPane root = new BorderPane();
         root.setTop(headerLayout);
+
         BorderPane.setAlignment(header,Pos.CENTER);
         root.setCenter(contentBox);
 
