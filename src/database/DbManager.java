@@ -26,30 +26,59 @@ public class DbManager {
         return enumeration.ordinal() + 1;
     }
 
+    public int[] sortIssues(int[] issueIds, String issuesSQLAttribute, boolean descending) {
+        try {
+            String issueIdsPlaceholder = "?";
+            // length -1 because we already have the first "?"*/
+            for (int i = 0; i < issueIds.length-1; ++i) {
+                issueIdsPlaceholder += ",?";
+            }
+
+            String descendingSQL = "";
+            if(descending)
+                descendingSQL = " DESC";
+
+            PreparedStatement sortIssueIdsQuery = connection.prepareStatement(
+            "SELECT issue_id FROM issues WHERE issue_id IN ("+issueIdsPlaceholder+")" +
+                "ORDER BY "+issuesSQLAttribute + descendingSQL);
+
+            for (int i = 0; i < issueIds.length; ++i) {
+                sortIssueIdsQuery.setInt(i+1, issueIds[i]);
+            }
+
+            ResultSet sortedIssuesResult = sortIssueIdsQuery.executeQuery();
+
+            int[] sortedIssueIds = new int[issueIds.length];
+
+            int index = 0;
+            while(sortedIssuesResult.next()) {
+                sortedIssueIds[index] = sortedIssuesResult.getInt(1);
+                index++;
+            }
+            if(issueIds.length != index)
+                throw new RuntimeException("different amount of issues selected by SQL than given in as input, check the issueIds parameter");
+            return sortedIssueIds;
+        } catch (SQLException e) {
+            System.out.println(e);
+        }
+        throw new RuntimeException("could not sort, read the SQL exception");
+    }
+
     public void iterateStatus(int issueId) {
         try {
             PreparedStatement selectStatusQuery = connection.prepareStatement("SELECT status_id FROM issues WHERE issue_id = ?");
             selectStatusQuery.setInt(1, issueId);
             ResultSet selectStatusResult = selectStatusQuery.executeQuery();
-
             int statusId = 0;
-            while(selectStatusResult.next()) {
+            if(selectStatusResult.next())
                 statusId = selectStatusResult.getInt(1);
-            }
-            Status status = null;
 
-            switch (statusId) {
-                case 0:
-                    throw new RuntimeException("status id is 0");
-                case 1:
-                    status = Status.IN_PROGRESS;
-                    break;
-                case 2:
-                    status = Status.RESOLVED;
-                    break;
-                case 3:
-                    throw new RuntimeException("status is already resolved, cannot change it");
-            }
+            Status status = switch (statusId) {
+                case 1 -> Status.IN_PROGRESS;
+                case 2 -> Status.RESOLVED;
+                case 3 -> throw new RuntimeException("status is already resolved, cannot change it");
+                default -> throw new IllegalArgumentException(statusId + " is invalid");
+            };
 
             PreparedStatement updateIssueQuery = connection.prepareStatement("UPDATE issues SET status_id = ? WHERE issue_id = ?");
             updateIssueQuery.setInt(1, convertEnumToSQLId(status));
@@ -63,7 +92,7 @@ public class DbManager {
     }
 
 
-    public int[] selectIssuesByCategory(Category category) {
+    public int[] selectIssuesInCategory(Category category) {
         int amountOfIssues = countIssuesInCategory(category);
 
         try {
@@ -98,9 +127,9 @@ public class DbManager {
             ResultSet issueIdCountResult = selectIssueIdCountQuery.executeQuery();
 
             int amountOfIssues = 0;
-            while(issueIdCountResult.next()) {
+            if(issueIdCountResult.next())
                 amountOfIssues = issueIdCountResult.getInt(1);
-            }
+
             System.out.println("There are " + amountOfIssues+" issues of category: " + category +",");
             return amountOfIssues;
         } catch (SQLException e) {
@@ -119,10 +148,9 @@ public class DbManager {
                         "WHERE issue_id = ?");
             selectRoadQuery.setInt(1, issueId);
             ResultSet selectRoadResult = selectRoadQuery.executeQuery();
-
-            while(selectRoadResult.next()) {
+            if(selectRoadResult.next())
                 return selectRoadResult.getString(1);
-            }
+
         } catch (SQLException e) {
             System.out.println(e);
         }
@@ -137,10 +165,9 @@ public class DbManager {
                         "WHERE issue_id = ?");
             selectHouseNrQuery.setInt(1, issueId);
             ResultSet selectHouseNrResult = selectHouseNrQuery.executeQuery();
-
-            while(selectHouseNrResult.next()) {
+            if(selectHouseNrResult.next())
                 return selectHouseNrResult.getInt(1);
-            }
+
         } catch (SQLException e) {
             System.out.println(e);
         }
@@ -154,9 +181,9 @@ public class DbManager {
             selectDescriptionQuery.setInt(1, issueId);
             ResultSet selectStatusResult = selectDescriptionQuery.executeQuery();
 
-            while(selectStatusResult.next()) {
+            if(selectStatusResult.next())
                 return selectStatusResult.getString(1);
-            }
+
         } catch (SQLException e) {
             System.out.println(e);
         }
@@ -171,9 +198,9 @@ public class DbManager {
             ResultSet selectStatusResult = selectStatusQuery.executeQuery();
 
             int statusId = 0;
-            while(selectStatusResult.next()) {
+            if(selectStatusResult.next())
                 statusId = selectStatusResult.getInt(1);
-            }
+
             switch (statusId) {
                 case 1:
                     return Status.PENDING;
@@ -182,6 +209,7 @@ public class DbManager {
                 case 3:
                     return Status.RESOLVED;
             }
+            System.out.println(statusId);
         } catch (SQLException e) {
             System.out.println(e);
         }
@@ -197,10 +225,8 @@ public class DbManager {
             selectEmailQuery.setInt(1, issueId);
             ResultSet selectEmailResult = selectEmailQuery.executeQuery();
 
-            while(selectEmailResult.next()) {
+            if(selectEmailResult.next())
                 return selectEmailResult.getString(1);
-            }
-
         } catch (SQLException e) {
             System.out.println(e);
         }
@@ -215,10 +241,7 @@ public class DbManager {
                         "WHERE issue_id = ?");
             selectEmailQuery.setInt(1, issueId);
             ResultSet selectEmailResult = selectEmailQuery.executeQuery();
-            while(selectEmailResult.next()) {
-                return true;
-            }
-            return false;
+            return selectEmailResult.next();
         } catch(SQLException e) {
             System.out.println(e);
         }
