@@ -59,7 +59,12 @@ and run the following init SQL query:
     FOREIGN KEY(citizen_id) REFERENCES citizens(citizen_id)
     );
 
+    ALTER TABLE citizens MODIFY COLUMN email VARCHAR(255) NOT NULL;
+
 ------------------------------------------------------------------------------------
+maybe this change is needed.
+
+    ALTER TABLE citizens MODIFY COLUMN email VARCHAR(255) NOT NULL;
 
 To reset the db, run this query, then run the init query again (you might have to disable safe mode).
 

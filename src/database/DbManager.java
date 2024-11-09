@@ -1,8 +1,11 @@
 package database;
 
 import Iter1.*;
+import Iter1.Category;
 
 import java.sql.*;
+import java.util.List;
+import java.util.ArrayList;
 
 public class DbManager {
     public static void main(String[] args) {
@@ -219,14 +222,16 @@ public class DbManager {
     public String fetchIssueEmail(int issueId) {
         try {
             PreparedStatement selectEmailQuery = connection.prepareStatement(
-                    "SELECT email FROM issues " +
-                        "INNER JOIN citizens ON citizens.citizen_id = issues.citizen_id " +
-                        "WHERE issue_id = ?");
+                    "SELECT citizens.email " +
+                            "FROM issues " +
+                            "INNER JOIN citizens ON issues.citizen_id = citizens.citizen_id " +
+                            "WHERE issues.issue_id = ?");
             selectEmailQuery.setInt(1, issueId);
             ResultSet selectEmailResult = selectEmailQuery.executeQuery();
 
-            if(selectEmailResult.next())
-                return selectEmailResult.getString(1);
+            if(selectEmailResult.next()) {
+                return selectEmailResult.getString("email");
+            }
         } catch (SQLException e) {
             System.out.println(e);
         }
@@ -246,5 +251,71 @@ public class DbManager {
             System.out.println(e);
         }
         throw new RuntimeException("failed to check if issue has an email");
+    }
+    public List<String> fetchIssuesByCategories(List<Category> selectedCategories) {
+        List<String> issues = new ArrayList<>();
+        if (selectedCategories.isEmpty()) {
+            return issues;
+        }
+        // Build the query
+        StringBuilder query = new StringBuilder("SELECT categories.category, issues.date, issues.description, citizens.email, statuses.status, " +
+                "locations.road, locations.housenumber " +
+                "FROM issues " +
+                "JOIN citizens ON issues.citizen_id = citizens.citizen_id " +
+                "JOIN categories ON issues.category_id = categories.category_id " +
+                "JOIN statuses ON issues.status_id = statuses.status_id " +
+                "JOIN locations ON issues.location_id = locations.location_id " +
+                "WHERE issues.category_id IN (");
+
+        // Add placeholders for the categories
+        for (int i = 0; i < selectedCategories.size(); i++) {
+            query.append("?");
+            if (i < selectedCategories.size() - 1) {
+                query.append(", ");
+            }
+        }
+        query.append(")");
+
+        // Execute the query
+        try (PreparedStatement statement = connection.prepareStatement(query.toString())) {
+            for (int i = 0; i < selectedCategories.size(); i++) {
+                statement.setInt(i + 1, convertEnumToSQLId(selectedCategories.get(i)));
+            }
+
+            ResultSet resultSet = statement.executeQuery();
+            while (resultSet.next()) {
+                String category = resultSet.getString("category");
+                Date date = resultSet.getDate("date");
+                String description = resultSet.getString("description");
+                String email = resultSet.getString("email");
+                String status = resultSet.getString("status");
+                String road = resultSet.getString("road");
+                int houseNumber = resultSet.getInt("housenumber");
+
+                // Format the result into a single string
+                String issueDetails = String.format("Category: %s, Date: %s, Description: %s, Road: %s, House Number: %d, Email: %s, Status: %s",
+                        category, date, description, road, houseNumber, email, status);
+                issues.add(issueDetails);
+            }
+
+        } catch (SQLException e) {
+            System.out.println(e);
+        }
+        return issues;
+    }
+
+
+    // Helper method to convert status ID to Status Enum
+    private Status getStatusFromId(int statusId) {
+        switch (statusId) {
+            case 1:
+                return Status.PENDING;
+            case 2:
+                return Status.IN_PROGRESS;
+            case 3:
+                return Status.RESOLVED;
+            default:
+                return null;
+        }
     }
 }
