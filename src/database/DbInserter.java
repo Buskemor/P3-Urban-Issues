@@ -9,9 +9,6 @@ import java.util.Date;
 
 
 public class DbInserter {
-
-
-
     private Connection connection;
     private Category category;
 
@@ -63,13 +60,13 @@ public class DbInserter {
 
 
 
-    public boolean areCategoriesValid() { //could argue that this should be moved to DbManager
+    private boolean areCategoriesValid() { //could argue that this should be moved to DbManager
         try {
             PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM categories");
             ResultSet resultSet = preparedStatement.executeQuery();
             int index = 0;
             while (resultSet.next()) {
-                resultSet.getInt("category_id");
+//                resultSet.getInt("category_id");
                 if (resultSet.getString("category").toUpperCase().equals(Category.values()[index].name())) {
                     System.out.println("Database category (" + resultSet.getString("category") + ") " +
                                         "equals java enum (" + Category.values()[index].name() + ") ✅");
@@ -90,14 +87,14 @@ public class DbInserter {
 
 
 
-    public int checkIfAttributeExists(String attribute) {
+    private int checkIfAttributeExists(String attribute) {
 //        String table = attribute + "s";
         try {
             ResultSet resultSet = null;
             PreparedStatement preparedStatement = null;
             if(attribute.equals("citizen")) {
                 preparedStatement = connection.prepareStatement(
-                "SELECT * FROM citizens WHERE ? = EMAIL");
+                "SELECT * FROM citizens WHERE ? = email");
                 preparedStatement.setString(1, email);
                 resultSet = preparedStatement.executeQuery();
             }
