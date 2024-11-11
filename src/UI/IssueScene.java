@@ -156,7 +156,7 @@ public class IssueScene {
         grid.add(emaillab,1,11,1,1);
         grid.add(emailtext,2,11,7,1);
 
-        grid.add(submitknap,7,15,1,1);
+        grid.add(submitknap,7,14,1,1);
 
         grid.setHgap(10);
         grid.setVgap(10);
@@ -192,8 +192,6 @@ public class IssueScene {
 
         BorderPane root = new BorderPane();
         root.setTop(headerLayout);
-
-        BorderPane.setAlignment(header,Pos.CENTER);
         root.setCenter(contentBox);
 
 
