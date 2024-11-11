@@ -92,7 +92,7 @@ public class IssueScene {
                 Alert alert = new Alert(Alert.AlertType.WARNING);
                 alert.setTitle("Missing Information");
                 alert.setHeaderText(null);
-                alert.setContentText("Please fill out the missing information. Nr needs to be ONLY a number, no letters");
+                alert.setContentText("Please fill out the missing information. Nr needs to be a number, no letters");
                 alert.showAndWait();
 
             } else {
