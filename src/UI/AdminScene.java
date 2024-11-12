@@ -137,14 +137,42 @@ public class AdminScene {
     // Method to update issues in the tableView based on selected categories
     private void updateIssues(TableView<Issue> tableView) {
 
+        boolean isRoadChecked = roadCheckBox.isSelected();
+        boolean isVandalismChecked = vandalismCheckBox.isSelected();
+        boolean isElectricalChecked = electricalCheckBox.isSelected();
+        boolean isWaterChecked = waterCheckBox.isSelected();
+        boolean isObstructionChecked = obstructionCheckBox.isSelected();
+        boolean isOtherChecked = otherCheckBox.isSelected();
+
         // Get selected categories
         ArrayList<Category> selectedCategories = new ArrayList<>();
-        if (roadCheckBox.isSelected()) selectedCategories.add(Category.ROAD);
-        if (vandalismCheckBox.isSelected()) selectedCategories.add(Category.VANDALISM);
-        if (electricalCheckBox.isSelected()) selectedCategories.add(Category.ELECTRICAL);
-        if (waterCheckBox.isSelected()) selectedCategories.add(Category.WATER);
-        if (obstructionCheckBox.isSelected()) selectedCategories.add(Category.OBSTRUCTION);
-        if (otherCheckBox.isSelected()) selectedCategories.add(Category.OTHER);
+        if (isRoadChecked)
+            selectedCategories.add(Category.ROAD);
+
+        if (isVandalismChecked)
+            selectedCategories.add(Category.VANDALISM);
+
+        if (isElectricalChecked)
+            selectedCategories.add(Category.ELECTRICAL);
+
+        if (isWaterChecked)
+            selectedCategories.add(Category.WATER);
+
+        if (isObstructionChecked)
+            selectedCategories.add(Category.OBSTRUCTION);
+
+        if (isOtherChecked)
+            selectedCategories.add(Category.OTHER);
+
+        if (!isRoadChecked && !isElectricalChecked && !isObstructionChecked && !isOtherChecked && !isWaterChecked && !isVandalismChecked){
+            selectedCategories.add(Category.ROAD);
+            selectedCategories.add(Category.VANDALISM);
+            selectedCategories.add(Category.ELECTRICAL);
+            selectedCategories.add(Category.WATER);
+            selectedCategories.add(Category.OBSTRUCTION);
+            selectedCategories.add(Category.OTHER);
+        }
+
 
         ObservableList<Issue> issues = getIssueData(selectedCategories);
         tableView.setItems(issues);
