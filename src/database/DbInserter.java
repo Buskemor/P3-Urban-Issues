@@ -20,7 +20,7 @@ public class DbInserter {
     private int houseNumber;
     public int locationId;
 
-    public DbInserter(Issue issue) {
+    public DbInserter(String road, int houseNumber, String description, Category category, Citizen citizen) {
         String url = "jdbc:mysql://localhost:3306/issuesdb";
         String username = "root";
         String password = "KENDATABASE123";
@@ -30,13 +30,29 @@ public class DbInserter {
         } catch (SQLException e) {
             System.out.println(e);
         }
-        this.description = issue.getDescription();
-        if(issue.getReportedBy() != null)
-            this.email = issue.getReportedBy().getEmail();
-        this.road = issue.getRoad();
-        this.houseNumber = issue.getHouseNumber();
-        this.category = issue.getCategory();
+        this.road = road;
+        this.houseNumber = houseNumber;
+        this.description = description;
+        this.category = category;
+        this.email = citizen.getEmail(); // maybe a bit strange, but it works
     }
+    public DbInserter(String road, int houseNumber, String description, Category category) {
+        String url = "jdbc:mysql://localhost:3306/issuesdb";
+        String username = "root";
+        String password = "KENDATABASE123";
+
+        try {
+            this.connection = DriverManager.getConnection(url, username, password);
+        } catch (SQLException e) {
+            System.out.println(e);
+        }
+        this.road = road;
+        this.houseNumber = houseNumber;
+        this.description = description;
+        this.category = category;
+        this.email = null;
+    }
+
 
 
 

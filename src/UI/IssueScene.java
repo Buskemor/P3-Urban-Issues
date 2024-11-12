@@ -119,13 +119,13 @@ public class IssueScene {
                 System.out.println(email);
                 System.out.println(finalhousenumber);
 
+                DbInserter issueInserter = null;
 
-                Issue issue = null;
-//                if (feedbackBox.isSelected())
-//                    issue = new Issue(location,finalhousenumber,description, finalCategory, new Citizen(email));
-//                else
-//                    issue = new Issue(location,finalhousenumber,description,finalCategory);
-//                new DbInserter(issue);
+                if (feedbackBox.isSelected())
+                    issueInserter = new DbInserter(location, finalhousenumber, description, finalCategory, new Citizen(email));
+                else
+                    issueInserter = new DbInserter(location, finalhousenumber, description, finalCategory);
+                issueInserter.addIssueToDatabase();
 
                 app.setScene(app.getSceneConfirmation());
             }

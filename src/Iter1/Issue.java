@@ -24,8 +24,8 @@ public class Issue {
         this.houseNumber = houseNumber;
         this.description=description;
         this.category=category;
-        this.status=Status.PENDING;
-        this.citizen=citizen;
+        this.status = status;
+        this.citizen =citizen;
     }
 
     public Issue(int issueId, Date date, String road, int houseNumber, String description, Category category, Status status){
@@ -35,7 +35,7 @@ public class Issue {
         this.houseNumber = houseNumber;
         this.description = description;
         this.category = category;
-        this.status = Status.PENDING;
+        this.status = status;
     }
 
     public static void main(String[] args) {
