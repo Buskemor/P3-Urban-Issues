@@ -27,7 +27,6 @@ public class AdminScene {
     private UI2 app;
     private Scene scene;
     private DbManager dbManager; // DbManager instance to interact with the database
-    private ListView<String> issueListView; // ListView to display issues
 
     private CheckBox roadCheckBox;
     private CheckBox vandalismCheckBox;
@@ -117,12 +116,16 @@ public class AdminScene {
         categoryLayout.setAlignment(Pos.TOP_LEFT);
         categoryLayout.setPadding(new Insets(10));
 
-        VBox mainLayout = new VBox(10, overskriftLab, underOverskriftLab, separator, categoryLayout, tableView);
+        HBox tablecatLay = new HBox(10,categoryLayout,tableView);
+        tablecatLay.setAlignment(Pos.TOP_LEFT);
+        tablecatLay.setPadding(new Insets(10));
+
+        VBox mainLayout = new VBox(10, overskriftLab, underOverskriftLab, separator, tablecatLay);
         mainLayout.setPadding(new Insets(10));
         mainLayout.setAlignment(Pos.TOP_CENTER);
 
         // Set up the scene
-        scene = new Scene(mainLayout, 800, 700);
+        scene = new Scene(mainLayout, 1000, 700);
 
         updateButton.setOnAction(e -> updateIssues(tableView));
     }
