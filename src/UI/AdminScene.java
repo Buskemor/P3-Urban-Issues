@@ -92,10 +92,10 @@ public class AdminScene {
         if (otherCheckBox.isSelected()) selectedCategories.add(Category.OTHER);
 
         // Fetch issues from the database
-        List<String> issues = dbManager.fetchIssuesByCategories(selectedCategories);
-
-        // Display issues in the ListView
-        ObservableList<String> observableIssues = FXCollections.observableArrayList(issues);
-        issueListView.setItems(observableIssues);
+//        List<String> issues = dbManager.fetchIssuesByCategories(selectedCategories);
+//
+//        // Display issues in the ListView
+//        ObservableList<String> observableIssues = FXCollections.observableArrayList(issues);
+//        issueListView.setItems(observableIssues);
     }
 }

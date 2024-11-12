@@ -4,9 +4,6 @@ public class SendFeedback {
 
     public static void sendFeedbackToCitizen(Status status, Citizen citizen){
 
-        if (!citizen.wantsFeedback())
-            return;
-
         if(status==Status.PENDING) {
             System.out.println("We have received your submission");
         }

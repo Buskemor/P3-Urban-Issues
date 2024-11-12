@@ -1,7 +1,6 @@
 package database;
 
 import Iter1.*;
-import Iter1.Category;
 
 import java.sql.*;
 import java.util.List;
@@ -10,9 +9,38 @@ import java.util.ArrayList;
 public class DbManager {
     public static void main(String[] args) {
         DbManager ta = new DbManager();
+
+//        DbInserter = new DbInserter(new Issue())
+
+//        ArrayList<Issue> gg = ta.fetchAllIssues();
+
+//        for (Issue element : gg) {
+//            System.out.println("Date: " + element.getDate());
+//            System.out.println("Status: " + element.getStatus());
+//            System.out.println("Road: " + element.getRoad());
+//            System.out.println("House Number: " + element.getHouseNumber());
+//            System.out.println("Description: " + element.getDescription());
+//            System.out.println("Category: " + element.getCategory());
+//            System.out.println("Reported By: " + element.getReportedBy());
+//            System.out.println("Issue ID: " + element.getIssueId());
+//            System.out.println(); // Blank line for readability between elements
+//        }
+
+        ArrayList<Category> cats = new ArrayList<Category>();
+        cats.add(Category.ELECTRICAL);
+        cats.add(Category.OBSTRUCTION);
+
+        ArrayList<Issue> issuesOfCat = ta.fetchIssuesByCategories(cats);
+
+        for(Issue element : issuesOfCat) {
+            System.out.println(element.getCategory());
+        }
+
+
     }
 
     private Connection connection;
+    private ArrayList<Issue> issues;
 
     public DbManager() {
         String url = "jdbc:mysql://localhost:3306/issuesdb";
@@ -23,6 +51,8 @@ public class DbManager {
         } catch (SQLException e) {
             System.out.println(e);
         }
+
+        this.issues = fetchAllIssues();
     }
 
     public int convertEnumToSQLId(Enum<?> enumeration) {
@@ -66,7 +96,7 @@ public class DbManager {
         }
         throw new RuntimeException("could not sort, read the SQL exception");
     }
-
+//    change this an all others issueId parameters to take in an Issue instance instead
     public void iterateStatus(int issueId) {
         try {
             PreparedStatement selectStatusQuery = connection.prepareStatement("SELECT status_id FROM issues WHERE issue_id = ?");
@@ -88,37 +118,37 @@ public class DbManager {
             updateIssueQuery.setInt(2, issueId);
             updateIssueQuery.execute();
 
-            SendFeedback.sendFeedbackToCitizen(status, new Citizen("PLACEHOLDER@GMAIL.COM",true));
+            SendFeedback.sendFeedbackToCitizen(status, new Citizen("PLACEHOLDER@GMAIL.COM"));
         } catch (SQLException e) {
             System.out.println(e);
         }
     }
 
 
-    public int[] selectIssuesInCategory(Category category) {
-        int amountOfIssues = countIssuesInCategory(category);
-
-        try {
-            PreparedStatement selectIssueIdsQuery = connection.prepareStatement(
-                    "SELECT issue_id FROM issues WHERE category_id = ?");
-            selectIssueIdsQuery.setInt(1, convertEnumToSQLId(category));
-            ResultSet issueIdsResult = selectIssueIdsQuery.executeQuery();
-
-            int[] issueIds = new int[amountOfIssues];
-            int index = 0;
-            System.out.print("issues ids of "+category+": ");
-            while(issueIdsResult.next()) {
-                issueIds[index] = issueIdsResult.getInt("issue_id");
-                System.out.print(issueIds[index]+", ");
-                index++;
-            }
-            System.out.println();
-            return issueIds;
-        } catch (SQLException e) {
-            System.out.println(e);
-        }
-        return new int[0];
-    }
+//    public int[] selectIssuesInCategory(Category category) {
+//        int amountOfIssues = countIssuesInCategory(category);
+//
+//        try {
+//            PreparedStatement selectIssueIdsQuery = connection.prepareStatement(
+//                    "SELECT issue_id FROM issues WHERE category_id = ?");
+//            selectIssueIdsQuery.setInt(1, convertEnumToSQLId(category));
+//            ResultSet issueIdsResult = selectIssueIdsQuery.executeQuery();
+//
+//            int[] issueIds = new int[amountOfIssues];
+//            int index = 0;
+//            System.out.print("issues ids of "+category+": ");
+//            while(issueIdsResult.next()) {
+//                issueIds[index] = issueIdsResult.getInt("issue_id");
+//                System.out.print(issueIds[index]+", ");
+//                index++;
+//            }
+//            System.out.println();
+//            return issueIds;
+//        } catch (SQLException e) {
+//            System.out.println(e);
+//        }
+//        return new int[0];
+//    }
 
 
 
@@ -252,54 +282,87 @@ public class DbManager {
         }
         throw new RuntimeException("failed to check if issue has an email");
     }
-    public List<String> fetchIssuesByCategories(List<Category> selectedCategories) {
-        List<String> issues = new ArrayList<>();
-        if (selectedCategories.isEmpty()) {
+
+
+    public ArrayList<Issue> fetchAllIssues() {
+//        int amountOfIssues = countIssuesInCategory(category);
+        ArrayList<Issue> issues = new ArrayList<Issue>();
+        try {
+            PreparedStatement selectAllQuery = connection.prepareStatement(
+                "SELECT issues.issue_id, date, locations.road, locations.housenumber, locations.location_id, categories.category, `description`, statuses.status_id, citizens.email " +
+                    "FROM issues " +
+                    "INNER JOIN locations ON locations.location_id = issues.location_id " +
+                    "INNER JOIN statuses ON statuses.status_id = issues.status_id " +
+                    "INNER JOIN categories ON categories.category_id = issues.category_id " +
+                    "LEFT OUTER JOIN citizens ON citizens.citizen_id = issues.citizen_id " +
+                    "ORDER BY date");
+
+            ResultSet selectAllResult = selectAllQuery.executeQuery();
+
+            int issueId = 0;
+            Date date = null;
+            String road = null;
+            int houseNumber = 0;
+            String description = null;
+            String categoryString = null;
+            int statusId = 0;
+            String email = null;
+
+
+            while(selectAllResult.next()) {
+                issueId = selectAllResult.getInt("issue_id");
+                date = selectAllResult.getDate("date");
+                road = selectAllResult.getString("road");
+                houseNumber = selectAllResult.getInt("housenumber");
+                description = selectAllResult.getString("description");
+                categoryString = selectAllResult.getString("category");
+                statusId = selectAllResult.getInt("status_id");
+                email = selectAllResult.getString("email");
+
+                categoryString = categoryString.toUpperCase();
+                Category category = null;
+
+                for(int i = 0; i < Category.values().length; ++i) {
+                    if(Category.values()[i] == Category.valueOf(categoryString)) {
+                        category=Category.values()[i];
+                        break;
+                    }
+                }
+
+                Status status = null;
+
+                switch (statusId) {
+                    case 1:
+                        status = Status.PENDING;
+                    case 2:
+                        status = Status.IN_PROGRESS;
+                    case 3:
+                        status = Status.RESOLVED;
+                }
+
+                if(email == null)
+                    issues.add(new Issue(issueId, date, road, houseNumber, description, category, status));
+                else {
+                    issues.add(new Issue(issueId, date, road, houseNumber, description, category, status, new Citizen(email)));
+                }
+            }
             return issues;
-        }
-        // Build the query
-        StringBuilder query = new StringBuilder("SELECT categories.category, issues.date, issues.description, citizens.email, statuses.status, " +
-                "locations.road, locations.housenumber " +
-                "FROM issues " +
-                "JOIN citizens ON issues.citizen_id = citizens.citizen_id " +
-                "JOIN categories ON issues.category_id = categories.category_id " +
-                "JOIN statuses ON issues.status_id = statuses.status_id " +
-                "JOIN locations ON issues.location_id = locations.location_id " +
-                "WHERE issues.category_id IN (");
-
-        // Add placeholders for the categories
-        for (int i = 0; i < selectedCategories.size(); i++) {
-            query.append("?");
-            if (i < selectedCategories.size() - 1) {
-                query.append(", ");
-            }
-        }
-        query.append(")");
-
-        // Execute the query
-        try (PreparedStatement statement = connection.prepareStatement(query.toString())) {
-            for (int i = 0; i < selectedCategories.size(); i++) {
-                statement.setInt(i + 1, convertEnumToSQLId(selectedCategories.get(i)));
-            }
-
-            ResultSet resultSet = statement.executeQuery();
-            while (resultSet.next()) {
-                String category = resultSet.getString("category");
-                Date date = resultSet.getDate("date");
-                String description = resultSet.getString("description");
-                String email = resultSet.getString("email");
-                String status = resultSet.getString("status");
-                String road = resultSet.getString("road");
-                int houseNumber = resultSet.getInt("housenumber");
-
-                // Format the result into a single string
-                String issueDetails = String.format("Category: %s, Date: %s, Description: %s, Road: %s, House Number: %d, Email: %s, Status: %s",
-                        category, date, description, road, houseNumber, email, status);
-                issues.add(issueDetails);
-            }
 
         } catch (SQLException e) {
             System.out.println(e);
+        }
+        return issues;
+    }
+
+
+    public ArrayList<Issue> fetchIssuesByCategories(ArrayList<Category> selectedCategories) {
+        ArrayList<Issue> issues = new ArrayList<>();
+
+        for(Issue issue : this.issues) {
+            for(Category category : selectedCategories) {
+                if(issue.getCategory() == category)
+                    issues.add(issue);
+            }
         }
         return issues;
     }

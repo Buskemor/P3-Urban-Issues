@@ -2,6 +2,7 @@ package UI;
 import Iter1.Category;
 import Iter1.Citizen;
 import Iter1.Issue;
+import database.DbInserter;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
@@ -99,7 +100,7 @@ public class IssueScene {
                 // Print information to console
                 int finalhousenumber = Integer.parseInt(houseNumber);
 
-                String tempcategory = category.toUpperCase();
+                String tempcategory = category.toUpperCase(); //going to use this code in DbManager
                 Category finalCategory = null;
 
                 for(int i = 0; i < Category.values().length; ++i) {
@@ -119,14 +120,12 @@ public class IssueScene {
                 System.out.println(finalhousenumber);
 
 
-
-                if (feedbackBox.isSelected()){
-                    new Issue(location,finalhousenumber,description, finalCategory,new Citizen(email,true));
-                }
-                else {
-                    new Issue(location,finalhousenumber,description,finalCategory);
-                }
-
+                Issue issue = null;
+//                if (feedbackBox.isSelected())
+//                    issue = new Issue(location,finalhousenumber,description, finalCategory, new Citizen(email));
+//                else
+//                    issue = new Issue(location,finalhousenumber,description,finalCategory);
+//                new DbInserter(issue);
 
                 app.setScene(app.getSceneConfirmation());
             }

@@ -1,22 +1,12 @@
 package Iter1;
+import database.DbInserter;
 
 public class Citizen {
 
     private String email;
-    private boolean wantsFeedback;
 
-    public Citizen(String email, boolean wantsFeedback){
-        this.email= email;
-        this.wantsFeedback=wantsFeedback;
-    }
-
-    public Issue submitIssue(String road, int houseNumber,String description, Category category){
-        return new Issue(road, houseNumber, description, category,this);
-    }
-
-    // Getter to check if the citizen wants feedback
-    public boolean wantsFeedback() {
-        return this.wantsFeedback;
+    public Citizen(String email) {
+        this.email = email;
     }
 
     public String getEmail() {
