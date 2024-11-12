@@ -1,7 +1,5 @@
 package Iter1;
 
-import database.DbInserter;
-
 import java.util.Date;
 
 
@@ -37,23 +35,6 @@ public class Issue {
         this.category = category;
         this.status = status;
     }
-
-    public static void main(String[] args) {
-
-    }
-
-    public void archiveIssue(Issue issue){
-
-    }
-
-    public void addIssueToDatabase(Issue issue){
-
-    }
-
-    public void removeIssueFromDatabase(Issue issue){
-
-    }
-
 
     public String getRoad() {
         return this.road;
