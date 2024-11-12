@@ -8,33 +8,36 @@ import java.util.ArrayList;
 
 public class DbManager {
     public static void main(String[] args) {
+
+//        issueInserter = new DbInserter(location, finalhousenumber, description, finalCategory, new Citizen(email));
+
         DbManager ta = new DbManager();
 
 //        DbInserter = new DbInserter(new Issue())
 
-//        ArrayList<Issue> gg = ta.fetchAllIssues();
+        ArrayList<Issue> gg = ta.fetchAllIssues();
 
-//        for (Issue element : gg) {
-//            System.out.println("Date: " + element.getDate());
-//            System.out.println("Status: " + element.getStatus());
-//            System.out.println("Road: " + element.getRoad());
-//            System.out.println("House Number: " + element.getHouseNumber());
-//            System.out.println("Description: " + element.getDescription());
-//            System.out.println("Category: " + element.getCategory());
-//            System.out.println("Reported By: " + element.getReportedBy());
-//            System.out.println("Issue ID: " + element.getIssueId());
-//            System.out.println(); // Blank line for readability between elements
-//        }
-
-        ArrayList<Category> cats = new ArrayList<Category>();
-        cats.add(Category.ELECTRICAL);
-        cats.add(Category.OBSTRUCTION);
-
-        ArrayList<Issue> issuesOfCat = ta.fetchIssuesByCategories(cats);
-
-        for(Issue element : issuesOfCat) {
-            System.out.println(element.getCategory());
+        for (Issue element : gg) {
+            System.out.println("Date: " + element.getDate());
+            System.out.println("Status: " + element.getStatus());
+            System.out.println("Road: " + element.getRoad());
+            System.out.println("House Number: " + element.getHouseNumber());
+            System.out.println("Description: " + element.getDescription());
+            System.out.println("Category: " + element.getCategory());
+            System.out.println("Reported By: " + element.getReportedBy());
+            System.out.println("Issue ID: " + element.getIssueId());
+            System.out.println(); // Blank line for readability between elements
         }
+
+//        ArrayList<Category> cats = new ArrayList<Category>();
+//        cats.add(Category.ELECTRICAL);
+//        cats.add(Category.OBSTRUCTION);
+//
+//        ArrayList<Issue> issuesOfCat = ta.fetchIssuesByCategories(cats);
+//
+//        for(Issue element : issuesOfCat) {
+//            System.out.println(element.getCategory());
+//        }
 
 
     }
@@ -163,6 +166,8 @@ public class DbManager {
                 categoryString = categoryString.toUpperCase();
                 Category category = null;
 
+
+
                 for(int i = 0; i < Category.values().length; ++i) {
                     if(Category.values()[i] == Category.valueOf(categoryString)) {
                         category=Category.values()[i];
@@ -170,16 +175,12 @@ public class DbManager {
                     }
                 }
 
-                Status status = null;
-
-                switch (statusId) {
-                    case 1:
-                        status = Status.PENDING;
-                    case 2:
-                        status = Status.IN_PROGRESS;
-                    case 3:
-                        status = Status.RESOLVED;
-                }
+                Status status = switch (statusId) {
+                    case 1 -> Status.PENDING;
+                    case 2 -> Status.IN_PROGRESS;
+                    case 3 -> Status.RESOLVED;
+                    default -> null;
+                };
 
                 if(email == null)
                     issues.add(new Issue(issueId, date, road, houseNumber, description, category, status));
