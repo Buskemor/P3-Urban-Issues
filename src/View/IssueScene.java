@@ -1,20 +1,23 @@
-package UI;
-import Iter1.Category;
-import Iter1.Citizen;
-import Iter1.Issue;
-import database.DbInserter;
+package View;
+import Controller.DbManager;
+import Model.Citizen;
+import Controller.DbInserter;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
+import javafx.util.Pair;
+
+import java.util.ArrayList;
 
 
 public class IssueScene {
 
     private UI2 app;
     private Scene scene;
+    private ArrayList<Pair<Integer, String>> categories = new DbManager().fetchCategories();
 
 
     public IssueScene(UI2 app) {
@@ -43,12 +46,9 @@ public class IssueScene {
         categoryBox.setPrefWidth(400);
 
         // Adding items to the ComboBox
-        categoryBox.getItems().add("Road");
-        categoryBox.getItems().add("Vandalism");
-        categoryBox.getItems().add("Electrical");
-        categoryBox.getItems().add("Water");
-        categoryBox.getItems().add("Obstruction");
-        categoryBox.getItems().add("Other");
+        for(Pair<Integer, String> category : categories) {
+            categoryBox.getItems().add(category.getValue());
+        }
 
         Label descriptionlab = new Label("Description*:");
         descriptionlab.setStyle("-fx-font-size: 16px;");
@@ -100,24 +100,13 @@ public class IssueScene {
                 // Print information to console
                 int finalhousenumber = Integer.parseInt(houseNumber);
 
-                String tempcategory = category.toUpperCase(); //going to use this code in DbManager
-                Category finalCategory = null;
+//                String tempcategory = category.toUpperCase(); //going to use this code in DbManager
+                Pair<Integer, String> finalCategory = null;
 
-                for(int i = 0; i < Category.values().length; ++i) {
-                    if(Category.values()[i] == Category.valueOf(tempcategory)) {
-                        System.out.println(Category.values()[i]);
-                        finalCategory=Category.values()[i];
-                        break;
-                    }
+                for(Pair<Integer, String> categoryPair : categories) {
+                    if(categoryPair.getValue().equals(category.substring(0,1).toUpperCase() + category.substring(1)))
+                        finalCategory = categoryPair;
                 }
-
-
-                System.out.println(finalCategory);
-                System.out.println(description);
-                System.out.println(location);
-                System.out.println(feedback);
-                System.out.println(email);
-                System.out.println(finalhousenumber);
 
                 DbInserter issueInserter = null;
 
@@ -128,6 +117,13 @@ public class IssueScene {
                 issueInserter.addIssueToDatabase();
 
                 app.setScene(app.getSceneConfirmation());
+
+                System.out.println(finalCategory);
+                System.out.println(description);
+                System.out.println(location);
+                System.out.println(feedback);
+                System.out.println(email);
+                System.out.println(finalhousenumber);
             }
         });
 

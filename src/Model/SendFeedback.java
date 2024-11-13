@@ -1,4 +1,4 @@
-package Iter1;
+package Model;
 
 public class SendFeedback {
 

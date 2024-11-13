@@ -1,9 +1,9 @@
-package database;
+package Controller;
 
-import Iter1.*;
+import Model.*;
+import javafx.util.Pair;
 
 import java.sql.*;
-import java.util.List;
 import java.util.ArrayList;
 
 public class DbManager {
@@ -13,21 +13,35 @@ public class DbManager {
 
         DbManager ta = new DbManager();
 
+        System.out.println(ta.fetchCategories());
 //        DbInserter = new DbInserter(new Issue())
 
-        ArrayList<Issue> gg = ta.fetchAllIssues();
+//        ArrayList<Issue> gg = ta.fetchAllIssues();
 
-        for (Issue element : gg) {
-            System.out.println("Date: " + element.getDate());
-            System.out.println("Status: " + element.getStatus());
-            System.out.println("Road: " + element.getRoad());
-            System.out.println("House Number: " + element.getHouseNumber());
-            System.out.println("Description: " + element.getDescription());
-            System.out.println("Category: " + element.getCategory());
-            System.out.println("Reported By: " + element.getReportedBy());
-            System.out.println("Issue ID: " + element.getIssueId());
-            System.out.println(); // Blank line for readability between elements
-        }
+//        for (Issue element : gg) {
+//            System.out.println("Date: " + element.getDate());
+//            System.out.println("Status: " + element.getStatus());
+//            System.out.println("Road: " + element.getRoad());
+//            System.out.println("House Number: " + element.getHouseNumber());
+//            System.out.println("Description: " + element.getDescription());
+//            System.out.println("Category: " + element.getCategory().getValue());
+//            System.out.println("Reported By: " + element.getReportedBy());
+//            System.out.println("Issue ID: " + element.getIssueId());
+//            System.out.println(); // Blank line for readability between elements
+//        }
+
+//        for(Pair<Integer, String> cat : ta.categories) {
+//            System.out.println(cat);
+//        }
+
+//        ArrayList<Issue> tata = new ArrayList<>();
+//        ArrayList<Pair<Integer, String>> ta2 = new ArrayList<>();
+//        ta2.add(new Pair<>(1, "Other"));
+//
+//        tata = ta.fetchIssuesByCategories(ta2);
+//
+//        for(Issue issue : tata)
+//            System.out.println(issue.getIssueId() + " " + issue.getCategory());
 
 //        ArrayList<Category> cats = new ArrayList<Category>();
 //        cats.add(Category.ELECTRICAL);
@@ -43,7 +57,6 @@ public class DbManager {
     }
 
     private Connection connection;
-    private ArrayList<Issue> issues;
 
     public DbManager() {
         String url = "jdbc:mysql://localhost:3306/issuesdb";
@@ -54,8 +67,6 @@ public class DbManager {
         } catch (SQLException e) {
             System.out.println(e);
         }
-
-        this.issues = fetchAllIssues();
     }
 
     public int convertEnumToSQLId(Enum<?> enumeration) {
@@ -91,11 +102,11 @@ public class DbManager {
     }
 
 
-    public ArrayList<Issue> fetchAllIssues() {
-        ArrayList<Issue> issues = new ArrayList<Issue>();
+    private ArrayList<Issue> fetchAllIssues() {
+        ArrayList<Issue> issues = new ArrayList<>();
         try {
             PreparedStatement selectAllQuery = connection.prepareStatement(
-                "SELECT issues.issue_id, date, locations.road, locations.housenumber, locations.location_id, categories.category, `description`, statuses.status_id, citizens.email " +
+                "SELECT issues.issue_id, date, locations.road, locations.housenumber, locations.location_id, categories.category_id, categories.category, `description`, statuses.status_id, citizens.email " +
                     "FROM issues " +
                     "INNER JOIN locations ON locations.location_id = issues.location_id " +
                     "INNER JOIN statuses ON statuses.status_id = issues.status_id " +
@@ -110,10 +121,12 @@ public class DbManager {
             String road = null;
             int houseNumber = 0;
             String description = null;
+            int categoryId = 0;
             String categoryString = null;
             int statusId = 0;
             String email = null;
 
+            ArrayList<Pair<Integer, String>> categories = new ArrayList<>();
 
             while(selectAllResult.next()) {
                 issueId = selectAllResult.getInt("issue_id");
@@ -121,21 +134,12 @@ public class DbManager {
                 road = selectAllResult.getString("road");
                 houseNumber = selectAllResult.getInt("housenumber");
                 description = selectAllResult.getString("description");
+                categoryId = selectAllResult.getInt("category_id");
                 categoryString = selectAllResult.getString("category");
                 statusId = selectAllResult.getInt("status_id");
                 email = selectAllResult.getString("email");
 
-                categoryString = categoryString.toUpperCase();
-                Category category = null;
-
-
-
-                for(int i = 0; i < Category.values().length; ++i) {
-                    if(Category.values()[i] == Category.valueOf(categoryString)) {
-                        category=Category.values()[i];
-                        break;
-                    }
-                }
+                Pair<Integer, String> category = new Pair<>(categoryId, categoryString.substring(0,1).toUpperCase() + categoryString.substring(1));
 
                 Status status = switch (statusId) {
                     case 1 -> Status.PENDING;
@@ -158,30 +162,38 @@ public class DbManager {
         return issues;
     }
 
-    public ArrayList<Issue> fetchIssuesByCategories(ArrayList<Category> selectedCategories) {
-        ArrayList<Issue> issues = new ArrayList<>();
+    public ArrayList<Pair<Integer, String>> fetchCategories() {
+        try {
+            PreparedStatement query = connection.prepareStatement("SELECT category, category_id FROM categories");
+            ResultSet result = query.executeQuery();
 
-        for(Issue issue : this.issues) {
-            for(Category category : selectedCategories) {
-                if(issue.getCategory() == category)
-                    issues.add(issue);
+            ArrayList<Pair<Integer, String>> categories = new ArrayList<>();
+            while(result.next()) {
+                categories.add(new Pair<>(
+                    result.getInt("category_id"),
+//                    Make the first letter in the category upper case
+                    result.getString("category").substring(0,1).toUpperCase()+result.getString("category").substring(1))
+                );
             }
+            return categories;
+
+        } catch (SQLException e) {
+            System.out.println(e);
         }
-        return issues;
+        throw new RuntimeException("No categories");
     }
 
+    public ArrayList<Issue> fetchIssuesByCategories(ArrayList<Pair<Integer, String>> selectedCategories) {
+        ArrayList<Issue> issues = new ArrayList<>();
+        for(Issue issue : this.fetchAllIssues())
+            for(Pair<Integer, String> category : selectedCategories) {
+                System.out.println(issue.getCategory());
+                System.out.println(category);
+                System.out.println();
+                if(issue.getCategory().equals(category))
+                    issues.add(issue);
+            }
 
-    // Helper method to convert status ID to Status Enum
-    private Status getStatusFromId(int statusId) {
-        switch (statusId) {
-            case 1:
-                return Status.PENDING;
-            case 2:
-                return Status.IN_PROGRESS;
-            case 3:
-                return Status.RESOLVED;
-            default:
-                return null;
-        }
+        return issues;
     }
 }

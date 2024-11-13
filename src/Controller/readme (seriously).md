@@ -70,7 +70,7 @@ To reset the db, run this query, then run the init query again (you might have t
 
     DROP TABLE issues, citizens, locations, categories, statuses;
 
-To select relevant parts of the database:
+To select relevant parts of the Controller:
 
     SELECT issues.issue_id, locations.road, locations.housenumber, locations.location_id, categories.category, `description`, statuses.status, citizens.email, citizens.citizen_id
     FROM issues

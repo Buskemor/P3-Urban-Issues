@@ -1,4 +1,6 @@
-package Iter1;
+package Model;
+
+import javafx.util.Pair;
 
 import java.util.Date;
 
@@ -10,12 +12,14 @@ public class Issue {
     private String road;
     private int houseNumber;
     private String description;
-    private Category category;
+    private Pair<Integer, String> category;
     private Status status;
     private Citizen citizen;
 
+    private String categoryDisplayString;
 
-    public Issue(int issueId, Date date, String road, int houseNumber, String description, Category category, Status status, Citizen citizen){
+
+    public Issue(int issueId, Date date, String road, int houseNumber, String description, Pair<Integer, String> category, Status status, Citizen citizen){
         this.issueId = issueId;
         this.date = date;
         this.road=road;
@@ -24,9 +28,11 @@ public class Issue {
         this.category=category;
         this.status = status;
         this.citizen =citizen;
+
+        categoryDisplayString = category.getValue();
     }
 
-    public Issue(int issueId, Date date, String road, int houseNumber, String description, Category category, Status status){
+    public Issue(int issueId, Date date, String road, int houseNumber, String description, Pair<Integer, String> category, Status status){
         this.issueId = issueId;
         this.date = date;
         this.road = road;
@@ -34,6 +40,8 @@ public class Issue {
         this.description = description;
         this.category = category;
         this.status = status;
+
+        categoryDisplayString = category.getValue();
     }
 
     public String getRoad() {
@@ -48,7 +56,7 @@ public class Issue {
         return this.description;
     }
 
-    public Category getCategory() {
+    public Pair<Integer, String> getCategory() {
         return this.category;
     }
 
@@ -68,35 +76,7 @@ public class Issue {
         return this.issueId;
     }
 
-
-
-
-    public void setRoad(String road) {
-        this.road = road;
+    public String getCategoryDisplayString() {
+        return this.categoryDisplayString;
     }
-
-    public void setHouseNumber(int houseNumber) {
-        this.houseNumber = houseNumber;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public void setCategory(Category category) {
-        this.category = category;
-    }
-
-    public void setStatus(Status status) {
-        this.status = status;
-    }
-
-    public void setReportedBy(Citizen citizen) {
-        this.citizen = citizen;
-    }
-
-    public void setDate(Date date) {
-        this.date = date;
-    }
-
 }
