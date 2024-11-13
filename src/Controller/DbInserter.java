@@ -1,13 +1,15 @@
-package database;
+package Controller;
 
-import Iter1.*;
+import Model.*;
+import javafx.util.Pair;
+
 import java.sql.*;
 import java.util.Date;
 
 
 public class DbInserter {
     private Connection connection;
-    private Category category;
+    private Pair<Integer, String> category;
 
     private String description;
     private String email;
@@ -17,7 +19,7 @@ public class DbInserter {
     private int houseNumber;
     public int locationId;
 
-    public DbInserter(String road, int houseNumber, String description, Category category, Citizen citizen) {
+    public DbInserter(String road, int houseNumber, String description, Pair<Integer, String> category, Citizen citizen) {
         String url = "jdbc:mysql://localhost:3306/issuesdb";
         String username = "root";
         String password = "KENDATABASE123";
@@ -33,7 +35,7 @@ public class DbInserter {
         this.category = category;
         this.email = citizen.getEmail(); // maybe a bit strange, but it works
     }
-    public DbInserter(String road, int houseNumber, String description, Category category) {
+    public DbInserter(String road, int houseNumber, String description, Pair<Integer, String> category) {
         String url = "jdbc:mysql://localhost:3306/issuesdb";
         String username = "root";
         String password = "KENDATABASE123";
@@ -52,11 +54,7 @@ public class DbInserter {
 
 
 
-
     public void addIssueToDatabase() {
-        if(!areCategoriesValid())
-            return;
-
         System.out.println("Checking if attribute id's already exist in the db:");
         citizenId = checkIfAttributeExists("citizen");
         locationId = checkIfAttributeExists("location");
@@ -68,34 +66,7 @@ public class DbInserter {
             locationId = insertUniqueSQLAttribute("location");
 
         System.out.println("Inserting into issues table..");
-        insertIssueIntoTable(new DbManager().convertEnumToSQLId(category));
-    }
-
-
-
-    private boolean areCategoriesValid() { //could argue that this should be moved to DbManager
-        try {
-            PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM categories");
-            ResultSet resultSet = preparedStatement.executeQuery();
-            int index = 0;
-            while (resultSet.next()) {
-//                resultSet.getInt("category_id");
-                if (resultSet.getString("category").toUpperCase().equals(Category.values()[index].name())) {
-                    System.out.println("Database category (" + resultSet.getString("category") + ") " +
-                                        "equals java enum (" + Category.values()[index].name() + ") ✅");
-                } else {
-                    System.out.println("Database category (" + resultSet.getString("category") + ") " +
-                                        "does NOT equal java enum (" + Category.values()[index].name() + ") ❌");
-                    return false;
-                }
-                index++;
-            }
-        } catch (SQLException e) {
-            System.out.println(e);
-        }
-        System.out.println("All categories are valid ✅");
-        System.out.println();
-        return true;
+        insertIssueIntoTable(category.getKey());
     }
 
 

@@ -390,13 +390,13 @@ Burmese Word Break Dictionary Data (burmesedict.txt)
 Time Zone Database
 
   ICU uses the public domain data and code derived from Time Zone
-Database for its time zone support. The ownership of the TZ database
+Database for its time zone support. The ownership of the TZ Controller
 is explained in BCP 175: Procedure for Maintaining the Time Zone
 Database section 7.
 
  # 7.  Database Ownership
  #
- #    The TZ database itself is not an IETF Contribution or an IETF
+ #    The TZ Controller itself is not an IETF Contribution or an IETF
  #    document.  Rather it is a pre-existing and regularly updated work
  #    that is in the public domain, and is intended to remain in the
  #    public domain.  Therefore, BCPs 78 [RFC5378] and 79 [RFC3979] do
@@ -406,8 +406,8 @@ Database section 7.
  #    Considerations defined in this RFC, under the memorandum of
  #    understanding with the IETF, currently ICANN, may act in accordance
  #    with all competent court orders.  No ownership claims will be made
- #    by ICANN or the IETF Trust on the database or the code.  Any person
- #    making a contribution to the database or code waives all rights to
+ #    by ICANN or the IETF Trust on the Controller or the code.  Any person
+ #    making a contribution to the Controller or code waives all rights to
  #    future claims in that contribution or in the TZ Database.
 
 ----------------------------------------------------------------------

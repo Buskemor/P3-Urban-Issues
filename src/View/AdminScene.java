@@ -1,10 +1,7 @@
-package UI;
+package View;
 
-
-import Iter1.Category;
-import Iter1.Citizen;
-import Iter1.Issue;
-import database.DbManager;
+import Model.*;
+import Controller.DbManager;
 
 import javafx.beans.property.SimpleStringProperty;
 import javafx.geometry.Insets;
@@ -17,27 +14,23 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.util.Pair;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 public class AdminScene {
 
     private UI2 app;
     private Scene scene;
-    private DbManager dbManager; // DbManager instance to interact with the database
+    private DbManager dbManager;
+    private ArrayList<Pair<Integer, String>> categories;
 
-    private CheckBox roadCheckBox;
-    private CheckBox vandalismCheckBox;
-    private CheckBox electricalCheckBox;
-    private CheckBox waterCheckBox;
-    private CheckBox obstructionCheckBox;
-    private CheckBox otherCheckBox;
 
     public AdminScene(UI2 app) {
         this.app = app;
-        this.dbManager = new DbManager(); // Initialize DbManager
+        this.dbManager = new DbManager();
+        this.categories = dbManager.fetchCategories();
         createScene();
     }
 
@@ -54,19 +47,17 @@ public class AdminScene {
         separator.setPrefWidth(700);
 
         // Issue category checkboxes
-        roadCheckBox = new CheckBox("ROAD");
-        vandalismCheckBox = new CheckBox("VANDALISM");
-        electricalCheckBox = new CheckBox("ELECTRICAL");
-        waterCheckBox = new CheckBox("WATER");
-        obstructionCheckBox = new CheckBox("OBSTRUCTION");
-        otherCheckBox = new CheckBox("OTHER");
+        ArrayList<CheckBox> checkBoxes = new ArrayList<>();
+        for(Pair<Integer, String> category : categories) {
+            checkBoxes.add(new CheckBox(category.getValue()));
+        }
 
         // "Update" button to fetch and display issues
         Button updateButton = new Button("Update");
 
         // Create TableView and set its data
         TableView<Issue> tableView = new TableView<>();
-        updateIssues(tableView);
+        updateIssues(tableView, checkBoxes);
 
         // Create columns
         TableColumn<Issue, Integer> issueIdCol = new TableColumn<>("ID");
@@ -92,7 +83,7 @@ public class AdminScene {
         descriptionCol.setPrefWidth(200);
 
         TableColumn<Issue, String> categoryCol = new TableColumn<>("Category");
-        categoryCol.setCellValueFactory(new PropertyValueFactory<>("category"));
+        categoryCol.setCellValueFactory(new PropertyValueFactory<>("categoryDisplayString"));
         categoryCol.setSortable(true);
 
         TableColumn<Issue, String> statusCol = new TableColumn<>("Status");
@@ -112,7 +103,10 @@ public class AdminScene {
 
 
         // Layout for the categories and ListView
-        VBox categoryLayout = new VBox(10, roadCheckBox, vandalismCheckBox, electricalCheckBox, waterCheckBox, obstructionCheckBox, otherCheckBox, updateButton);
+//        VBox categoryLayout = new VBox(10, roadCheckBox, vandalismCheckBox, electricalCheckBox, waterCheckBox, obstructionCheckBox, otherCheckBox, updateButton);
+        VBox categoryLayout = new VBox(10);
+        categoryLayout.getChildren().addAll(checkBoxes);
+        categoryLayout.getChildren().add(updateButton);
         categoryLayout.setAlignment(Pos.TOP_LEFT);
         categoryLayout.setPadding(new Insets(10));
 
@@ -127,7 +121,7 @@ public class AdminScene {
         // Set up the scene
         scene = new Scene(mainLayout, 1000, 700);
 
-        updateButton.setOnAction(e -> updateIssues(tableView));
+        updateButton.setOnAction(e -> updateIssues(tableView, checkBoxes));
     }
 
     public Scene getScene() {
@@ -135,53 +129,26 @@ public class AdminScene {
     }
 
     // Method to update issues in the tableView based on selected categories
-    private void updateIssues(TableView<Issue> tableView) {
+    private void updateIssues(TableView<Issue> tableView, ArrayList<CheckBox> checkBoxes) {
+        ArrayList<Pair<Integer, String>> selectedCategories = new ArrayList<>();
 
-        boolean isRoadChecked = roadCheckBox.isSelected();
-        boolean isVandalismChecked = vandalismCheckBox.isSelected();
-        boolean isElectricalChecked = electricalCheckBox.isSelected();
-        boolean isWaterChecked = waterCheckBox.isSelected();
-        boolean isObstructionChecked = obstructionCheckBox.isSelected();
-        boolean isOtherChecked = otherCheckBox.isSelected();
+        for(CheckBox checkBox : checkBoxes)
+            if(checkBox.isSelected())
+                for(Pair<Integer, String> category : categories)
+                    if(checkBox.getText().equals(category.getValue()))
+                        selectedCategories.add(category);
 
-        // Get selected categories
-        ArrayList<Category> selectedCategories = new ArrayList<>();
-        if (isRoadChecked)
-            selectedCategories.add(Category.ROAD);
-
-        if (isVandalismChecked)
-            selectedCategories.add(Category.VANDALISM);
-
-        if (isElectricalChecked)
-            selectedCategories.add(Category.ELECTRICAL);
-
-        if (isWaterChecked)
-            selectedCategories.add(Category.WATER);
-
-        if (isObstructionChecked)
-            selectedCategories.add(Category.OBSTRUCTION);
-
-        if (isOtherChecked)
-            selectedCategories.add(Category.OTHER);
-
-        if (!isRoadChecked && !isElectricalChecked && !isObstructionChecked && !isOtherChecked && !isWaterChecked && !isVandalismChecked){
-            selectedCategories.add(Category.ROAD);
-            selectedCategories.add(Category.VANDALISM);
-            selectedCategories.add(Category.ELECTRICAL);
-            selectedCategories.add(Category.WATER);
-            selectedCategories.add(Category.OBSTRUCTION);
-            selectedCategories.add(Category.OTHER);
-        }
-
+        if(selectedCategories.isEmpty())
+            selectedCategories.addAll(categories);
 
         ObservableList<Issue> issues = getIssueData(selectedCategories);
         tableView.setItems(issues);
     }
-    private ObservableList<Issue> getIssueData(ArrayList<Category> selectedCategories) {
+
+    private ObservableList<Issue> getIssueData(ArrayList<Pair<Integer, String>> selectedCategories) {
         ArrayList<Issue> issues = dbManager.fetchIssuesByCategories(selectedCategories);
         return FXCollections.observableArrayList(
                 issues
         );
     }
-
 }

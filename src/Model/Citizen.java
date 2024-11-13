@@ -1,5 +1,4 @@
-package Iter1;
-import database.DbInserter;
+package Model;
 
 public class Citizen {
 
