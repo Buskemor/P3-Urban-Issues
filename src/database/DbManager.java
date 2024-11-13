@@ -62,43 +62,6 @@ public class DbManager {
         return enumeration.ordinal() + 1;
     }
 
-    public int[] sortIssues(int[] issueIds, String issuesSQLAttribute, boolean descending) {
-        try {
-            String issueIdsPlaceholder = "?";
-            // length -1 because we already have the first "?"*/
-            for (int i = 0; i < issueIds.length-1; ++i) {
-                issueIdsPlaceholder += ",?";
-            }
-
-            String descendingSQL = "";
-            if(descending)
-                descendingSQL = " DESC";
-
-            PreparedStatement sortIssueIdsQuery = connection.prepareStatement(
-            "SELECT issue_id FROM issues WHERE issue_id IN ("+issueIdsPlaceholder+")" +
-                "ORDER BY "+issuesSQLAttribute + descendingSQL);
-
-            for (int i = 0; i < issueIds.length; ++i) {
-                sortIssueIdsQuery.setInt(i+1, issueIds[i]);
-            }
-
-            ResultSet sortedIssuesResult = sortIssueIdsQuery.executeQuery();
-
-            int[] sortedIssueIds = new int[issueIds.length];
-
-            int index = 0;
-            while(sortedIssuesResult.next()) {
-                sortedIssueIds[index] = sortedIssuesResult.getInt(1);
-                index++;
-            }
-            if(issueIds.length != index)
-                throw new RuntimeException("different amount of issues selected by SQL than given in as input, check the issueIds parameter");
-            return sortedIssueIds;
-        } catch (SQLException e) {
-            System.out.println(e);
-        }
-        throw new RuntimeException("could not sort, read the SQL exception");
-    }
 //    change this an all others issueId parameters to take in an Issue instance instead
     public void iterateStatus(int issueId) {
         try {
@@ -129,7 +92,6 @@ public class DbManager {
 
 
     public ArrayList<Issue> fetchAllIssues() {
-//        int amountOfIssues = countIssuesInCategory(category);
         ArrayList<Issue> issues = new ArrayList<Issue>();
         try {
             PreparedStatement selectAllQuery = connection.prepareStatement(

@@ -1,9 +1,6 @@
 package database;
 
-//import Iter1.Status;
 import Iter1.*;
-import UI.UI2;
-
 import java.sql.*;
 import java.util.Date;
 
