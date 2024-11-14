@@ -98,33 +98,33 @@ public class AdminScene {
         Button addCategoryButton = new Button("Add New Category");
 
         addCategoryButton.setOnAction(e -> {
-            String newCategoryName = newCategoryField.getText().trim();
-            if (!newCategoryName.isEmpty()) {
-                // Insert new category into the database
-                boolean success = dbAdmin.addNewCategory(newCategoryName);
-                if (success) {
-                    // Clear the input field after successful insertion
-                    newCategoryField.clear();
-                    categories = dbAdmin.fetchCategories(); // Update the category list
-                    // add functionality so that the user can see the newly created category:
-                    Alert alert = new Alert(Alert.AlertType.WARNING);
-                    alert.setTitle("Success");
-                    alert.setHeaderText(null);
-                    alert.setContentText("The new Category has been successfully made!");
-                    alert.showAndWait();
-                } else {
-                    // Handle error (optional, you can display an alert or log the error)
-                    System.out.println("Error: Could not add category.");
-                }
-            } else {
-                // Optionally handle case where the input is empty
+            String newCategoryName = newCategoryField.getText().trim().toLowerCase();
+            if(newCategoryName.isEmpty()) {
                 System.out.println("Error: Category name cannot be empty.");
                 Alert alert = new Alert(Alert.AlertType.WARNING);
                 alert.setTitle("Missing Information");
                 alert.setHeaderText(null);
                 alert.setContentText("Category name cannot be empty");
                 alert.showAndWait();
+                return;
             }
+            if(!dbAdmin.addNewCategory(newCategoryName)) {
+                Alert alert = new Alert(Alert.AlertType.WARNING);
+                alert.setTitle("Success");
+                alert.setHeaderText(null);
+                alert.setContentText("Failed to add category to database.");
+                alert.showAndWait();
+                return;
+            }
+
+            newCategoryField.clear();
+            categories = dbAdmin.fetchCategories(); // Update the category list
+            // add functionality so that the user can see the newly created category:
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("Success");
+            alert.setHeaderText(null);
+            alert.setContentText("The new Category has been successfully made!");
+            alert.showAndWait();
         });
 
         TableColumn<Issue, Status> statusCol = new TableColumn<>("Status");
