@@ -9,12 +9,12 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.util.Pair;
+import javafx.scene.control.ComboBox;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -51,13 +51,15 @@ public class AdminScene {
         for(Pair<Integer, String> category : categories) {
             checkBoxes.add(new CheckBox(category.getValue()));
         }
+        CheckBox showResolvedCheckbox = new CheckBox("Resolved Issues");
 
         // "Update" button to fetch and display issues
         Button updateButton = new Button("Update");
 
         // Create TableView and set its data
         TableView<Issue> tableView = new TableView<>();
-        updateIssues(tableView, checkBoxes);
+        updateIssues(tableView, checkBoxes, showResolvedCheckbox);
+        tableView.setPrefWidth(820);
 
         // Create columns
         TableColumn<Issue, Integer> issueIdCol = new TableColumn<>("ID");
@@ -86,9 +88,71 @@ public class AdminScene {
         categoryCol.setCellValueFactory(new PropertyValueFactory<>("categoryDisplayString"));
         categoryCol.setSortable(true);
 
-        TableColumn<Issue, String> statusCol = new TableColumn<>("Status");
+        TextField newCategoryField = new TextField();
+        newCategoryField.setPromptText("Enter new category name");
+
+        Button addCategoryButton = new Button("Add New Category");
+
+        addCategoryButton.setOnAction(e -> {
+            String newCategoryName = newCategoryField.getText().trim();
+            if (!newCategoryName.isEmpty()) {
+                // Insert new category into the database
+                boolean success = dbManager.addNewCategory(newCategoryName);
+                if (success) {
+                    // Clear the input field after successful insertion
+                    newCategoryField.clear();
+                    categories = dbManager.fetchCategories(); // Update the category list
+                    // add functionality so that the user can see the newly created category:
+                    Alert alert = new Alert(Alert.AlertType.WARNING);
+                    alert.setTitle("Success");
+                    alert.setHeaderText(null);
+                    alert.setContentText("The new Category has been successfully made!");
+                    alert.showAndWait();
+                } else {
+                    // Handle error (optional, you can display an alert or log the error)
+                    System.out.println("Error: Could not add category.");
+                }
+            } else {
+                // Optionally handle case where the input is empty
+                System.out.println("Error: Category name cannot be empty.");
+                Alert alert = new Alert(Alert.AlertType.WARNING);
+                alert.setTitle("Missing Information");
+                alert.setHeaderText(null);
+                alert.setContentText("Category name cannot be empty");
+                alert.showAndWait();
+            }
+        });
+
+        TableColumn<Issue, Status> statusCol = new TableColumn<>("Status");
         statusCol.setCellValueFactory(new PropertyValueFactory<>("status"));
         statusCol.setSortable(true);
+
+        // Setting a ComboBox as a cell editor for the Status column
+        statusCol.setCellFactory(column -> new TableCell<>() {
+            private final ComboBox<Status> statusDropdown = new ComboBox<>(FXCollections.observableArrayList(Status.values()));
+
+            {
+                statusDropdown.setOnAction(event -> {
+                    Status newStatus = statusDropdown.getValue();
+                    Issue currentIssue = getTableView().getItems().get(getIndex());
+                    dbManager.updateIssueStatus(currentIssue, newStatus); // Update in DB
+                    currentIssue.setStatus(newStatus); // Update in the model
+                    getTableView().refresh(); // Refresh table to show updated status maybe doesnt do anything
+                });
+            }
+
+            @Override
+            protected void updateItem(Status status, boolean empty) {
+                super.updateItem(status, empty);
+                if (empty || status == null) {
+                    setGraphic(null);
+                } else {
+                    statusDropdown.setValue(status); // Set current status
+                    setGraphic(statusDropdown); // Display ComboBox in cell
+                }
+            }
+        });
+
 
         TableColumn<Issue, String> citizenEmailCol = new TableColumn<>("Email");
         citizenEmailCol.setCellValueFactory(cellData -> {
@@ -101,11 +165,13 @@ public class AdminScene {
         // Add columns to TableView
         tableView.getColumns().addAll(issueIdCol, dateCol, roadCol, houseNumberCol, descriptionCol, categoryCol, statusCol, citizenEmailCol);
 
+        HBox newCatLay = new HBox(10,newCategoryField,addCategoryButton);
+        newCatLay.setAlignment(Pos.BOTTOM_CENTER);
+        newCatLay.setPadding(new Insets(10));
 
-        // Layout for the categories and ListView
-//        VBox categoryLayout = new VBox(10, roadCheckBox, vandalismCheckBox, electricalCheckBox, waterCheckBox, obstructionCheckBox, otherCheckBox, updateButton);
         VBox categoryLayout = new VBox(10);
         categoryLayout.getChildren().addAll(checkBoxes);
+        categoryLayout.getChildren().addAll(showResolvedCheckbox);
         categoryLayout.getChildren().add(updateButton);
         categoryLayout.setAlignment(Pos.TOP_LEFT);
         categoryLayout.setPadding(new Insets(10));
@@ -114,14 +180,14 @@ public class AdminScene {
         tablecatLay.setAlignment(Pos.TOP_LEFT);
         tablecatLay.setPadding(new Insets(10));
 
-        VBox mainLayout = new VBox(10, overskriftLab, underOverskriftLab, separator, tablecatLay);
+        VBox mainLayout = new VBox(10, overskriftLab, underOverskriftLab, separator, tablecatLay,newCatLay);
         mainLayout.setPadding(new Insets(10));
         mainLayout.setAlignment(Pos.TOP_CENTER);
 
         // Set up the scene
         scene = new Scene(mainLayout, 1000, 700);
 
-        updateButton.setOnAction(e -> updateIssues(tableView, checkBoxes));
+        updateButton.setOnAction(e -> updateIssues(tableView, checkBoxes, showResolvedCheckbox));
     }
 
     public Scene getScene() {
@@ -129,24 +195,28 @@ public class AdminScene {
     }
 
     // Method to update issues in the tableView based on selected categories
-    private void updateIssues(TableView<Issue> tableView, ArrayList<CheckBox> checkBoxes) {
+    private void updateIssues(TableView<Issue> tableView, ArrayList<CheckBox> checkBoxes, CheckBox showResolvedCheckbox) {
         ArrayList<Pair<Integer, String>> selectedCategories = new ArrayList<>();
 
-        for(CheckBox checkBox : checkBoxes)
-            if(checkBox.isSelected())
-                for(Pair<Integer, String> category : categories)
-                    if(checkBox.getText().equals(category.getValue()))
+        for(CheckBox checkBox : checkBoxes) {
+            if (checkBox.isSelected())
+                for (Pair<Integer, String> category : categories)
+                    if (checkBox.getText().equals(category.getValue()))
                         selectedCategories.add(category);
-
+        }
         if(selectedCategories.isEmpty())
             selectedCategories.addAll(categories);
 
-        ObservableList<Issue> issues = getIssueData(selectedCategories);
+        ObservableList<Issue> issues = getIssueData(selectedCategories, showResolvedCheckbox.isSelected());
         tableView.setItems(issues);
     }
 
-    private ObservableList<Issue> getIssueData(ArrayList<Pair<Integer, String>> selectedCategories) {
+    private ObservableList<Issue> getIssueData(ArrayList<Pair<Integer, String>> selectedCategories, boolean showResolved){
         ArrayList<Issue> issues = dbManager.fetchIssuesByCategories(selectedCategories);
+
+        if (!showResolved) {
+            issues.removeIf(issue -> issue.getStatus() == Status.RESOLVED);
+        }
         return FXCollections.observableArrayList(
                 issues
         );

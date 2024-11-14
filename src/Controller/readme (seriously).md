@@ -28,7 +28,7 @@ and run the following init SQL query:
     category VARCHAR(30) NOT NULL
     );
     INSERT INTO categories(category)
-    VALUES('other'), ('vandalism'), ('electrical'), ('water'), ('obstruction'), ('road');
+    VALUES('road'), ('vandalism'), ('electrical'), ('water'), ('obstruction'), ('other');
     
     CREATE TABLE statuses (
     status_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,

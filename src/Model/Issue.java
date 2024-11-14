@@ -76,6 +76,10 @@ public class Issue {
         return this.issueId;
     }
 
+    public void setStatus(Status status) {
+        this.status = status;
+    }
+
     public String getCategoryDisplayString() {
         return this.categoryDisplayString;
     }

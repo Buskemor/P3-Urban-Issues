@@ -12,7 +12,6 @@ public class DbManager {
 //        issueInserter = new DbInserter(location, finalhousenumber, description, finalCategory, new Citizen(email));
 
         DbManager ta = new DbManager();
-
         System.out.println(ta.fetchCategories());
 //        DbInserter = new DbInserter(new Issue())
 
@@ -73,34 +72,18 @@ public class DbManager {
         return enumeration.ordinal() + 1;
     }
 
-//    change this an all others issueId parameters to take in an Issue instance instead
-    public void iterateStatus(int issueId) {
-        try {
-            PreparedStatement selectStatusQuery = connection.prepareStatement("SELECT status_id FROM issues WHERE issue_id = ?");
-            selectStatusQuery.setInt(1, issueId);
-            ResultSet selectStatusResult = selectStatusQuery.executeQuery();
-            int statusId = 0;
-            if(selectStatusResult.next())
-                statusId = selectStatusResult.getInt(1);
 
-            Status status = switch (statusId) {
-                case 1 -> Status.IN_PROGRESS;
-                case 2 -> Status.RESOLVED;
-                case 3 -> throw new RuntimeException("status is already resolved, cannot change it");
-                default -> throw new IllegalArgumentException(statusId + " is invalid");
-            };
-
-            PreparedStatement updateIssueQuery = connection.prepareStatement("UPDATE issues SET status_id = ? WHERE issue_id = ?");
-            updateIssueQuery.setInt(1, convertEnumToSQLId(status));
-            updateIssueQuery.setInt(2, issueId);
-            updateIssueQuery.execute();
-
-            SendFeedback.sendFeedbackToCitizen(status, new Citizen("PLACEHOLDER@GMAIL.COM"));
+    public void updateIssueStatus(Issue issue, Status newStatus) {
+        int issueId = issue.getIssueId();
+        try (PreparedStatement updateStatusQuery = connection.prepareStatement(
+                "UPDATE issues SET status_id = ? WHERE issue_id = ?")) {
+            updateStatusQuery.setInt(1, convertEnumToSQLId(newStatus));
+            updateStatusQuery.setInt(2, issueId);
+            updateStatusQuery.executeUpdate();
         } catch (SQLException e) {
             System.out.println(e);
         }
     }
-
 
     private ArrayList<Issue> fetchAllIssues() {
         ArrayList<Issue> issues = new ArrayList<>();
@@ -183,13 +166,22 @@ public class DbManager {
         throw new RuntimeException("No categories");
     }
 
+    public boolean addNewCategory(String newCategory) {
+        String query = "INSERT INTO categories(category) VALUES(?)";
+        try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+            preparedStatement.setString(1, newCategory);
+            int rowsAffected = preparedStatement.executeUpdate();
+            return rowsAffected > 0; // Returns true if the insertion was successful
+        } catch (SQLException e) {
+            System.out.println("Error adding new category: " + e.getMessage());
+            return false; // If there was an error
+        }
+    }
+
     public ArrayList<Issue> fetchIssuesByCategories(ArrayList<Pair<Integer, String>> selectedCategories) {
         ArrayList<Issue> issues = new ArrayList<>();
         for(Issue issue : this.fetchAllIssues())
             for(Pair<Integer, String> category : selectedCategories) {
-                System.out.println(issue.getCategory());
-                System.out.println(category);
-                System.out.println();
                 if(issue.getCategory().equals(category))
                     issues.add(issue);
             }
