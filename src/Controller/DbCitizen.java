@@ -7,8 +7,7 @@ import java.sql.*;
 import java.util.Date;
 
 
-public class DbInserter {
-    private Connection connection;
+public class DbCitizen extends DbManager {
     private Pair<Integer, String> category;
 
     private String description;
@@ -19,37 +18,24 @@ public class DbInserter {
     private int houseNumber;
     public int locationId;
 
-    public DbInserter(String road, int houseNumber, String description, Pair<Integer, String> category, Citizen citizen) {
-        String url = "jdbc:mysql://localhost:3306/issuesdb";
-        String username = "root";
-        String password = "KENDATABASE123";
+//    new DbCitizen(12,2,2,,2,2,2,2, )
 
-        try {
-            this.connection = DriverManager.getConnection(url, username, password);
-        } catch (SQLException e) {
-            System.out.println(e);
-        }
+    public DbCitizen (String road, int houseNumber, String description, Pair<Integer, String> category,
+                      String username, String password, String ip, String port, String schema,
+                      Citizen citizen) {
+        super(username, password, ip, port, schema);
+
         this.road = road;
         this.houseNumber = houseNumber;
         this.description = description;
         this.category = category;
-        this.email = citizen.getEmail(); // maybe a bit strange, but it works
+        if(citizen != null)
+            this.email = citizen.getEmail();
     }
-    public DbInserter(String road, int houseNumber, String description, Pair<Integer, String> category) {
-        String url = "jdbc:mysql://localhost:3306/issuesdb";
-        String username = "root";
-        String password = "KENDATABASE123";
 
-        try {
-            this.connection = DriverManager.getConnection(url, username, password);
-        } catch (SQLException e) {
-            System.out.println(e);
-        }
-        this.road = road;
-        this.houseNumber = houseNumber;
-        this.description = description;
-        this.category = category;
-        this.email = null;
+    public DbCitizen(String road, int houseNumber, String description, Pair<Integer, String> category,
+                     String username, String password, String ip, String port, String schema) {
+        this(road, houseNumber, description, category, username, password, ip, port, schema, null);
     }
 
 

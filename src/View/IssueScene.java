@@ -1,7 +1,8 @@
 package View;
-import Controller.DbManager;
+import Controller.DbAdmin;
 import Model.Citizen;
-import Controller.DbInserter;
+import Controller.DbCitizen;
+import View.JavaFXExtensions.Title;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
@@ -17,7 +18,13 @@ public class IssueScene {
 
     private UI2 app;
     private Scene scene;
-    private ArrayList<Pair<Integer, String>> categories = new DbManager().fetchCategories();
+    private ArrayList<Pair<Integer, String>> categories = new DbAdmin(
+            "root",
+            "KENDATABASE123",
+            "localhost",
+            "3306",
+            "issuesdb"
+    ).fetchCategories();
 
 
     public IssueScene(UI2 app) {
@@ -26,8 +33,8 @@ public class IssueScene {
     }
 
     private void createScene() {
-        Label header = new Label("Urban Issue Reporting");
-        header.setStyle("-fx-font-size: 28px; -fx-font-weight: bold;"); // Style the header
+        Title header = new Title("Urban Issue Reporting");
+//        header.setStyle("-fx-font-size: 28px; -fx-font-weight: bold;"); // Style the header
 
         // Create Separator
         Separator separator = new Separator();
@@ -54,8 +61,8 @@ public class IssueScene {
         descriptionlab.setStyle("-fx-font-size: 16px;");
         TextField descriptiontext = new TextField();
 
-        Label imagelab = new Label("Image:");
-        imagelab.setStyle("-fx-font-size: 16px;");
+//        Label imagelab = new Label("Image:");
+//        imagelab.setStyle("-fx-font-size: 16px;");
 
 
         Label locationlab = new Label("Road Name*:");
@@ -63,7 +70,7 @@ public class IssueScene {
         TextField locationtext = new TextField();
 
         Label numberlab = new Label("Nr*:");
-        descriptionlab.setStyle("-fx-font-size: 16px;");
+        numberlab.setStyle("-fx-font-size: 16px;");
         TextField numbertext = new TextField();
 
         Label feedbacklab= new Label("Receive feedback?:");
@@ -108,12 +115,12 @@ public class IssueScene {
                         finalCategory = categoryPair;
                 }
 
-                DbInserter issueInserter = null;
+                DbCitizen issueInserter = null;
 
                 if (feedbackBox.isSelected())
-                    issueInserter = new DbInserter(location, finalhousenumber, description, finalCategory, new Citizen(email));
+                    issueInserter = new DbCitizen(location, finalhousenumber, description, finalCategory, "root", "KENDATABASE123", "localhost", "3306", "issuesdb", new Citizen(email));
                 else
-                    issueInserter = new DbInserter(location, finalhousenumber, description, finalCategory);
+                    issueInserter = new DbCitizen(location, finalhousenumber, description, finalCategory, "root", "KENDATABASE123", "localhost", "3306", "issuesdb");
                 issueInserter.addIssueToDatabase();
 
                 app.setScene(app.getSceneConfirmation());
@@ -137,21 +144,21 @@ public class IssueScene {
         grid.add(descriptionlab,1,7,1,1);
         grid.add(descriptiontext,2,7,7,1);
 
-        grid.add(imagelab,1,8,1,1);
+//        grid.add(imagelab,1,8,1,1);
 
-        grid.add(locationlab,1,9,1,1);
-        grid.add(locationtext,2,9,5,1);
+        grid.add(locationlab,1,8,1,1);
+        grid.add(locationtext,2,8,5,1);
 
-        grid.add(numberlab,7,9,1,1);
-        grid.add(numbertext,8,9,1,1);
+        grid.add(numberlab,7,8,1,1);
+        grid.add(numbertext,8,8,1,1);
 
-        grid.add(feedbacklab,1,10,1,1);
-        grid.add(feedbackBox,2,10,1,1);
+        grid.add(feedbacklab,1,9,1,1);
+        grid.add(feedbackBox,2,9,1,1);
 
-        grid.add(emaillab,1,11,1,1);
-        grid.add(emailtext,2,11,7,1);
+        grid.add(emaillab,1,10,1,1);
+        grid.add(emailtext,2,10,7,1);
 
-        grid.add(submitknap,7,14,1,1);
+        grid.add(submitknap,7,13,1,1);
 
         grid.setHgap(10);
         grid.setVgap(10);
@@ -170,7 +177,7 @@ public class IssueScene {
         GridPane.setHalignment(categorylab, HPos.RIGHT);
         GridPane.setHalignment(numberlab, HPos.RIGHT);
         GridPane.setHalignment(descriptionlab, HPos.RIGHT);
-        GridPane.setHalignment(imagelab, HPos.RIGHT);
+//        GridPane.setHalignment(imagelab, HPos.RIGHT);
         GridPane.setHalignment(locationlab, HPos.RIGHT);
         GridPane.setHalignment(feedbacklab, HPos.RIGHT);
         GridPane.setHalignment(emaillab, HPos.RIGHT);

@@ -1,6 +1,7 @@
 package View;
 
 
+import View.JavaFXExtensions.*;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
@@ -21,11 +22,11 @@ public class ConfirmationScene {
     }
 
     private void createScene() {
-        Label overskriftLab = new Label("URBAN ISSUE REPORTING");
-        overskriftLab.setStyle("-fx-font-size: 28px; -fx-font-weight: bold;");
+        Title overskriftLab = new Title("URBAN ISSUE REPORTING");
+//        overskriftLab.setStyle("-fx-font-size: 28px; -fx-font-weight: bold;");
 
-        Label underOverskriftLab = new Label("''Your City, Your Voice, Your Impact''");
-        underOverskriftLab.setStyle("-fx-font-size: 20px;");
+        SubTitle underOverskriftLab = new SubTitle("''Your City, Your Voice, Your Impact''");
+//        underOverskriftLab.setStyle("-fx-font-size: 20px;");
 
         // Create Separator
         Separator separator = new Separator();

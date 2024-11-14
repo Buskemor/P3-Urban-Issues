@@ -1,8 +1,10 @@
 package View;
 
 import Model.*;
-import Controller.DbManager;
+import Controller.DbAdmin;
 
+import View.JavaFXExtensions.SubTitle;
+import View.JavaFXExtensions.Title;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -23,33 +25,35 @@ public class AdminScene {
 
     private UI2 app;
     private Scene scene;
-    private DbManager dbManager;
+    private DbAdmin dbAdmin;
     private ArrayList<Pair<Integer, String>> categories;
 
 
     public AdminScene(UI2 app) {
         this.app = app;
-        this.dbManager = new DbManager();
-        this.categories = dbManager.fetchCategories();
+        this.dbAdmin = new DbAdmin("root", "KENDATABASE123", "localhost", "3306", "issuesdb");
+        this.categories = dbAdmin.fetchCategories();
         createScene();
     }
 
 
     private void createScene() {
         // Existing labels and layout components
-        Label overskriftLab = new Label("URBAN ISSUE REPORTING");
-        overskriftLab.setStyle("-fx-font-size: 28px; -fx-font-weight: bold;");
+        Title overskriftLab = new Title("URBAN ISSUE REPORTING");
+//        Label overskriftLab = new Label("URBAN ISSUE REPORTING");
+//        overskriftLab.setStyle("-fx-font-size: 28px; -fx-font-weight: bold;");
 
-        Label underOverskriftLab = new Label("''Your City, Your Voice, Your Impact''");
-        underOverskriftLab.setStyle("-fx-font-size: 20px;");
+        SubTitle underOverskriftLab = new SubTitle("''Your City, Your Voice, Your Impact''");
+//        underOverskriftLab.setStyle("-fx-font-size: 20px;");
 
         Separator separator = new Separator();
         separator.setPrefWidth(700);
 
         // Issue category checkboxes
-        ArrayList<CheckBox> checkBoxes = new ArrayList<>();
+        ArrayList<CategoryCheckBox> checkBoxes = new ArrayList<>();
         for(Pair<Integer, String> category : categories) {
-            checkBoxes.add(new CheckBox(category.getValue()));
+//            checkBoxes.add(new CheckBox(category.getValue()));
+            checkBoxes.add(new CategoryCheckBox(category.getKey(), category.getValue()));
         }
         CheckBox showResolvedCheckbox = new CheckBox("Resolved Issues");
 
@@ -97,11 +101,11 @@ public class AdminScene {
             String newCategoryName = newCategoryField.getText().trim();
             if (!newCategoryName.isEmpty()) {
                 // Insert new category into the database
-                boolean success = dbManager.addNewCategory(newCategoryName);
+                boolean success = dbAdmin.addNewCategory(newCategoryName);
                 if (success) {
                     // Clear the input field after successful insertion
                     newCategoryField.clear();
-                    categories = dbManager.fetchCategories(); // Update the category list
+                    categories = dbAdmin.fetchCategories(); // Update the category list
                     // add functionality so that the user can see the newly created category:
                     Alert alert = new Alert(Alert.AlertType.WARNING);
                     alert.setTitle("Success");
@@ -135,7 +139,7 @@ public class AdminScene {
                 statusDropdown.setOnAction(event -> {
                     Status newStatus = statusDropdown.getValue();
                     Issue currentIssue = getTableView().getItems().get(getIndex());
-                    dbManager.updateIssueStatus(currentIssue, newStatus); // Update in DB
+                    dbAdmin.updateIssueStatus(currentIssue, newStatus); // Update in DB
                     currentIssue.setStatus(newStatus); // Update in the model
                     getTableView().refresh(); // Refresh table to show updated status maybe doesnt do anything
                 });
@@ -195,15 +199,15 @@ public class AdminScene {
     }
 
     // Method to update issues in the tableView based on selected categories
-    private void updateIssues(TableView<Issue> tableView, ArrayList<CheckBox> checkBoxes, CheckBox showResolvedCheckbox) {
+    private void updateIssues(TableView<Issue> tableView, ArrayList<CategoryCheckBox> checkBoxes, CheckBox showResolvedCheckbox) {
         ArrayList<Pair<Integer, String>> selectedCategories = new ArrayList<>();
 
-        for(CheckBox checkBox : checkBoxes) {
+        for(CategoryCheckBox checkBox : checkBoxes)
             if (checkBox.isSelected())
                 for (Pair<Integer, String> category : categories)
-                    if (checkBox.getText().equals(category.getValue()))
+                    if (checkBox.getCategoryId() == category.getKey())
                         selectedCategories.add(category);
-        }
+
         if(selectedCategories.isEmpty())
             selectedCategories.addAll(categories);
 
@@ -212,7 +216,7 @@ public class AdminScene {
     }
 
     private ObservableList<Issue> getIssueData(ArrayList<Pair<Integer, String>> selectedCategories, boolean showResolved){
-        ArrayList<Issue> issues = dbManager.fetchIssuesByCategories(selectedCategories);
+        ArrayList<Issue> issues = dbAdmin.fetchIssuesByCategories(selectedCategories);
 
         if (!showResolved) {
             issues.removeIf(issue -> issue.getStatus() == Status.RESOLVED);

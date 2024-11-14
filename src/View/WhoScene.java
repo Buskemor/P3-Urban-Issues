@@ -1,5 +1,6 @@
 package View;
 
+import View.JavaFXExtensions.*;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -18,11 +19,11 @@ public class WhoScene {
     }
 
     private void createScene() {
-        Label overskrift = new Label("URBAN ISSUE REPORTING");
-        overskrift.setStyle("-fx-font-size: 30px; -fx-font-weight: bold;");
+        Title overskrift = new Title("URBAN ISSUE REPORTING");
+//        overskrift.setStyle("-fx-font-size: 30px; -fx-font-weight: bold;");
 
-        Label underOverskrift = new Label("''Your City, Your Voice, Your Impact''");
-        underOverskrift.setStyle("-fx-font-size: 20px;");
+        SubTitle underOverskrift = new SubTitle("''Your City, Your Voice, Your Impact''");
+//        underOverskrift.setStyle("-fx-font-size: 20px;");
 
         Label whoAreYou = new Label("Who are you?");
         whoAreYou.setStyle("-fx-font-size: 18px;");

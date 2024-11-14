@@ -22,12 +22,12 @@ public class Issue {
     public Issue(int issueId, Date date, String road, int houseNumber, String description, Pair<Integer, String> category, Status status, Citizen citizen){
         this.issueId = issueId;
         this.date = date;
-        this.road=road;
+        this.road = road;
         this.houseNumber = houseNumber;
-        this.description=description;
-        this.category=category;
+        this.description = description;
+        this.category = category;
         this.status = status;
-        this.citizen =citizen;
+        this.citizen = citizen;
 
         categoryDisplayString = category.getValue();
     }
