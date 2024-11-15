@@ -40,11 +40,8 @@ public class AdminScene {
     private void createScene() {
         // Existing labels and layout components
         Title overskriftLab = new Title("URBAN ISSUE REPORTING");
-//        Label overskriftLab = new Label("URBAN ISSUE REPORTING");
-//        overskriftLab.setStyle("-fx-font-size: 28px; -fx-font-weight: bold;");
 
         SubTitle underOverskriftLab = new SubTitle("''Your City, Your Voice, Your Impact''");
-//        underOverskriftLab.setStyle("-fx-font-size: 20px;");
 
         Separator separator = new Separator();
         separator.setPrefWidth(700);
@@ -52,7 +49,6 @@ public class AdminScene {
         // Issue category checkboxes
         ArrayList<CategoryCheckBox> checkBoxes = new ArrayList<>();
         for(Pair<Integer, String> category : categories) {
-//            checkBoxes.add(new CheckBox(category.getValue()));
             checkBoxes.add(new CategoryCheckBox(category.getKey(), category.getValue()));
         }
         CheckBox showResolvedCheckbox = new CheckBox("Resolved Issues");
@@ -174,8 +170,8 @@ public class AdminScene {
         newCatLay.setPadding(new Insets(10));
 
         VBox categoryLayout = new VBox(10);
-        categoryLayout.getChildren().addAll(checkBoxes);
         categoryLayout.getChildren().addAll(showResolvedCheckbox);
+        categoryLayout.getChildren().addAll(checkBoxes);
         categoryLayout.getChildren().add(updateButton);
         categoryLayout.setAlignment(Pos.TOP_LEFT);
         categoryLayout.setPadding(new Insets(10));
