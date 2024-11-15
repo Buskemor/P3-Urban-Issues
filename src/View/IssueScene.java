@@ -34,7 +34,6 @@ public class IssueScene {
 
     private void createScene() {
         Title header = new Title("Urban Issue Reporting");
-//        header.setStyle("-fx-font-size: 28px; -fx-font-weight: bold;"); // Style the header
 
         // Create Separator
         Separator separator = new Separator();
@@ -73,13 +72,29 @@ public class IssueScene {
         numberlab.setStyle("-fx-font-size: 16px;");
         TextField numbertext = new TextField();
 
-        Label feedbacklab= new Label("Receive feedback?:");
+
+        Label feedbacklab= new Label("Receive feedback and receive follow-up questions if necessary?:");
         feedbacklab.setStyle("-fx-font-size: 16px;");
+        feedbacklab.setWrapText(true); // Enables text wrapping
+        feedbacklab.setMaxWidth(150); // Adjust the width to fit your layout
         CheckBox feedbackBox = new CheckBox();
 
         Label emaillab = new Label("E-mail:");
         emaillab.setStyle("-fx-font-size: 16px;");
         TextField emailtext = new TextField();
+
+        feedbackBox.selectedProperty().addListener((observable, oldValue, newValue) -> {
+            emaillab.setVisible(newValue);
+            emaillab.setManaged(newValue);
+            emailtext.setVisible(newValue);
+            emailtext.setManaged(newValue);
+        });
+
+// Initially hide the email label and text field
+        emaillab.setVisible(false);
+        emaillab.setManaged(false);
+        emailtext.setVisible(false);
+        emailtext.setManaged(false);
 
 
         Button submitknap= new Button("Submit");
@@ -152,13 +167,13 @@ public class IssueScene {
         grid.add(numberlab,7,8,1,1);
         grid.add(numbertext,8,8,1,1);
 
-        grid.add(feedbacklab,1,9,1,1);
-        grid.add(feedbackBox,2,9,1,1);
+        grid.add(feedbacklab,1,11,1,1);
+        grid.add(feedbackBox,2,11,1,1);
 
-        grid.add(emaillab,1,10,1,1);
-        grid.add(emailtext,2,10,7,1);
+        grid.add(emaillab,1,12,1,1);
+        grid.add(emailtext,2,12,7,1);
 
-        grid.add(submitknap,7,13,1,1);
+        grid.add(submitknap,7,15,1,1);
 
         grid.setHgap(10);
         grid.setVgap(10);

@@ -178,4 +178,75 @@ public class DbAdmin extends DbManager {
 
         return issues;
     }
+
+    public boolean checkIfCategoryHasIssues(String categoryName) {
+        String query = "SELECT COUNT(*) AS issueCount FROM issues " +
+                "INNER JOIN categories ON issues.category_id = categories.category_id " +
+                "WHERE categories.category = ?";
+        try (PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setString(1, categoryName);
+            ResultSet resultSet = statement.executeQuery();
+            if (resultSet.next()) {
+                int issueCount = resultSet.getInt("issueCount");
+                return issueCount > 0;
+            }
+        } catch (SQLException e) {
+            System.out.println("Error checking category issues: " + e.getMessage());
+        }
+        return false;
+    }
+
+    public boolean deleteCategory(String categoryName) {
+        try {
+            connection.setAutoCommit(false); // Begin transaction
+
+            // Check if category exists
+            PreparedStatement categoryCheckStmt = connection.prepareStatement(
+                    "SELECT category_id FROM categories WHERE category = ?");
+            categoryCheckStmt.setString(1, categoryName);
+            ResultSet result = categoryCheckStmt.executeQuery();
+
+            if (!result.next()) {
+                System.out.println("Category not found.");
+                return false;
+            }
+
+            int categoryId = result.getInt("category_id");
+
+            // Reassign issues to "DeletedCategory" if they exist
+            PreparedStatement reassignStmt = connection.prepareStatement(
+                    "UPDATE issues SET category_id = " +
+                            "(SELECT category_id FROM categories WHERE category = 'deletedcategory') " +
+                            "WHERE category_id = ?");
+            reassignStmt.setInt(1, categoryId);
+            reassignStmt.executeUpdate();
+
+            // Delete the category
+            PreparedStatement deleteStmt = connection.prepareStatement(
+                    "DELETE FROM categories WHERE category_id = ?");
+            deleteStmt.setInt(1, categoryId);
+            int rowsAffected = deleteStmt.executeUpdate();
+
+            connection.commit(); // Commit transaction
+            return rowsAffected > 0;
+
+        } catch (SQLException e) {
+            try {
+                connection.rollback(); // Rollback transaction on error
+            } catch (SQLException rollbackEx) {
+                System.out.println("Rollback failed: " + rollbackEx.getMessage());
+            }
+            System.out.println("Error deleting category: " + e.getMessage());
+        } finally {
+            try {
+                connection.setAutoCommit(true); // Reset auto-commit
+            } catch (SQLException e) {
+                System.out.println("Failed to reset auto-commit: " + e.getMessage());
+            }
+        }
+        return false;
+    }
+
+
+
 }

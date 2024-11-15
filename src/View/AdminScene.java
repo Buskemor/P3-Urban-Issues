@@ -88,40 +88,9 @@ public class AdminScene {
         categoryCol.setCellValueFactory(new PropertyValueFactory<>("categoryDisplayString"));
         categoryCol.setSortable(true);
 
-        TextField newCategoryField = new TextField();
-        newCategoryField.setPromptText("Enter new category name");
+        Button buttonAdvancedSettingsScene = new Button("Go to Advanced Settings");
+        buttonAdvancedSettingsScene.setOnAction(e -> app.setScene(app.getSceneAdvancedSettings()));
 
-        Button addCategoryButton = new Button("Add New Category");
-
-        addCategoryButton.setOnAction(e -> {
-            String newCategoryName = newCategoryField.getText().trim().toLowerCase();
-            if(newCategoryName.isEmpty()) {
-                System.out.println("Error: Category name cannot be empty.");
-                Alert alert = new Alert(Alert.AlertType.WARNING);
-                alert.setTitle("Missing Information");
-                alert.setHeaderText(null);
-                alert.setContentText("Category name cannot be empty");
-                alert.showAndWait();
-                return;
-            }
-            if(!dbAdmin.addNewCategory(newCategoryName)) {
-                Alert alert = new Alert(Alert.AlertType.WARNING);
-                alert.setTitle("Success");
-                alert.setHeaderText(null);
-                alert.setContentText("Failed to add category to database.");
-                alert.showAndWait();
-                return;
-            }
-
-            newCategoryField.clear();
-            categories = dbAdmin.fetchCategories(); // Update the category list
-            // add functionality so that the user can see the newly created category:
-            Alert alert = new Alert(Alert.AlertType.WARNING);
-            alert.setTitle("Success");
-            alert.setHeaderText(null);
-            alert.setContentText("The new Category has been successfully made!");
-            alert.showAndWait();
-        });
 
         TableColumn<Issue, Status> statusCol = new TableColumn<>("Status");
         statusCol.setCellValueFactory(new PropertyValueFactory<>("status"));
@@ -165,12 +134,14 @@ public class AdminScene {
         // Add columns to TableView
         tableView.getColumns().addAll(issueIdCol, dateCol, roadCol, houseNumberCol, descriptionCol, categoryCol, statusCol, citizenEmailCol);
 
-        HBox newCatLay = new HBox(10,newCategoryField,addCategoryButton);
-        newCatLay.setAlignment(Pos.BOTTOM_CENTER);
-        newCatLay.setPadding(new Insets(10));
+
+        // Create a spacer to add space between the checkbox and the categories
+        Label spacer = new Label();
+        spacer.setPrefHeight(20); // Adjust height as needed
 
         VBox categoryLayout = new VBox(10);
         categoryLayout.getChildren().addAll(showResolvedCheckbox);
+        categoryLayout.getChildren().addAll(spacer);
         categoryLayout.getChildren().addAll(checkBoxes);
         categoryLayout.getChildren().add(updateButton);
         categoryLayout.setAlignment(Pos.TOP_LEFT);
@@ -180,12 +151,12 @@ public class AdminScene {
         tablecatLay.setAlignment(Pos.TOP_LEFT);
         tablecatLay.setPadding(new Insets(10));
 
-        VBox mainLayout = new VBox(10, overskriftLab, underOverskriftLab, separator, tablecatLay,newCatLay);
+        VBox mainLayout = new VBox(10, overskriftLab, underOverskriftLab, separator, tablecatLay,buttonAdvancedSettingsScene);
         mainLayout.setPadding(new Insets(10));
         mainLayout.setAlignment(Pos.TOP_CENTER);
 
         // Set up the scene
-        scene = new Scene(mainLayout, 1000, 700);
+        scene = new Scene(mainLayout, 1200, 800);
 
         updateButton.setOnAction(e -> updateIssues(tableView, checkBoxes, showResolvedCheckbox));
     }
