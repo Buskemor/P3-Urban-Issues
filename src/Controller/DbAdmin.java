@@ -119,6 +119,7 @@ public class DbAdmin extends DbManager {
                     case 1 -> Status.PENDING;
                     case 2 -> Status.IN_PROGRESS;
                     case 3 -> Status.RESOLVED;
+                    case 4 -> Status.CANCELLED;
                     default -> null;
                 };
 
@@ -222,10 +223,12 @@ public class DbAdmin extends DbManager {
             reassignStmt.executeUpdate();
 
             // Delete the category
+            System.out.println(categoryId);
             PreparedStatement deleteStmt = connection.prepareStatement(
                     "DELETE FROM categories WHERE category_id = ?");
             deleteStmt.setInt(1, categoryId);
             int rowsAffected = deleteStmt.executeUpdate();
+            System.out.println(categoryId);
 
             connection.commit(); // Commit transaction
             return rowsAffected > 0;
@@ -237,7 +240,7 @@ public class DbAdmin extends DbManager {
                 System.out.println("Rollback failed: " + rollbackEx.getMessage());
             }
             System.out.println("Error deleting category: " + e.getMessage());
-        } finally {
+            } finally {
             try {
                 connection.setAutoCommit(true); // Reset auto-commit
             } catch (SQLException e) {

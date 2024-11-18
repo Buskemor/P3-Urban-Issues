@@ -13,5 +13,8 @@ public class SendFeedback {
         if (status==Status.RESOLVED) {
             System.out.println("Your submission has been resolved");
         }
+        if(status ==Status.CANCELLED) {
+            System.out.println("Your submission has been cancelled");
+        }
     }
 }

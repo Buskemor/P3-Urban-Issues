@@ -52,13 +52,14 @@ public class AdminScene {
             checkBoxes.add(new CategoryCheckBox(category.getKey(), category.getValue()));
         }
         CheckBox showResolvedCheckbox = new CheckBox("Resolved Issues");
+        CheckBox showCancelledCheckBox = new CheckBox("Cancelled Issues");
 
         // "Update" button to fetch and display issues
         Button updateButton = new Button("Update");
 
         // Create TableView and set its data
         TableView<Issue> tableView = new TableView<>();
-        updateIssues(tableView, checkBoxes, showResolvedCheckbox);
+        updateIssues(tableView, checkBoxes, showResolvedCheckbox, showCancelledCheckBox);
         tableView.setPrefWidth(820);
 
         // Create columns
@@ -140,7 +141,7 @@ public class AdminScene {
         spacer.setPrefHeight(20); // Adjust height as needed
 
         VBox categoryLayout = new VBox(10);
-        categoryLayout.getChildren().addAll(showResolvedCheckbox);
+        categoryLayout.getChildren().addAll(showResolvedCheckbox, showCancelledCheckBox);
         categoryLayout.getChildren().addAll(spacer);
         categoryLayout.getChildren().addAll(checkBoxes);
         categoryLayout.getChildren().add(updateButton);
@@ -158,7 +159,7 @@ public class AdminScene {
         // Set up the scene
         scene = new Scene(mainLayout, 1200, 800);
 
-        updateButton.setOnAction(e -> updateIssues(tableView, checkBoxes, showResolvedCheckbox));
+        updateButton.setOnAction(e -> updateIssues(tableView, checkBoxes, showResolvedCheckbox, showCancelledCheckBox));
     }
 
     public Scene getScene() {
@@ -166,7 +167,7 @@ public class AdminScene {
     }
 
     // Method to update issues in the tableView based on selected categories
-    private void updateIssues(TableView<Issue> tableView, ArrayList<CategoryCheckBox> checkBoxes, CheckBox showResolvedCheckbox) {
+    private void updateIssues(TableView<Issue> tableView, ArrayList<CategoryCheckBox> checkBoxes, CheckBox showResolvedCheckbox, CheckBox showCancelledCheckBox) {
         ArrayList<Pair<Integer, String>> selectedCategories = new ArrayList<>();
 
         for(CategoryCheckBox checkBox : checkBoxes)
@@ -178,16 +179,33 @@ public class AdminScene {
         if(selectedCategories.isEmpty())
             selectedCategories.addAll(categories);
 
-        ObservableList<Issue> issues = getIssueData(selectedCategories, showResolvedCheckbox.isSelected());
+        ObservableList<Issue> issues = getIssueData(selectedCategories, showResolvedCheckbox.isSelected(), showCancelledCheckBox.isSelected());
         tableView.setItems(issues);
     }
 
-    private ObservableList<Issue> getIssueData(ArrayList<Pair<Integer, String>> selectedCategories, boolean showResolved){
+    private ObservableList<Issue> getIssueData(ArrayList<Pair<Integer, String>> selectedCategories, boolean showResolved, boolean showCancelled){
+//        TODO: MAKE THIS ARRAYLIST AN ATTRIBUTE
         ArrayList<Issue> issues = dbAdmin.fetchIssuesByCategories(selectedCategories);
+        System.out.println(issues);
 
-        if (!showResolved) {
+        if(!showResolved)
             issues.removeIf(issue -> issue.getStatus() == Status.RESOLVED);
+        if(!showCancelled)
+            issues.removeIf(issue -> issue.getStatus() == Status.CANCELLED);
+
+        if(showResolved && showCancelled) {
+            issues.removeIf(issue -> (issue.getStatus() != Status.RESOLVED && issue.getStatus() != Status.CANCELLED));
+            System.out.println("both are true");
+            return FXCollections.observableArrayList(
+                    issues
+            );
         }
+
+        if(showResolved)
+            issues.removeIf(issue -> issue.getStatus() != Status.RESOLVED);
+        if(showCancelled)
+            issues.removeIf(issue -> issue.getStatus() != Status.CANCELLED);
+
         return FXCollections.observableArrayList(
                 issues
         );

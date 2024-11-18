@@ -46,6 +46,7 @@ public class IssueScene {
         Label underoverskrift = new Label("Please describe the issue below:");
         underoverskrift.setStyle("-fx-font-size: 16px;");
 
+
         Label categorylab= new Label("Category*:");
         categorylab.setStyle("-fx-font-size: 16px;");
         ComboBox<String> categoryBox = new ComboBox<>();
