@@ -17,6 +17,11 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.util.Pair;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.MenuItem;
+import javafx.scene.input.Clipboard;
+import javafx.scene.input.ClipboardContent;
+import javafx.scene.control.TableRow;
+import javafx.scene.input.MouseButton;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -45,6 +50,13 @@ public class AdminScene {
 
         Separator separator = new Separator();
         separator.setPrefWidth(700);
+
+        Label statusLabel = new Label("Status filter");
+        statusLabel.setStyle("-fx-font-weight: bold;");
+
+
+        Label categoryLabel = new Label("Category filter");
+        categoryLabel.setStyle("-fx-font-weight: bold;");
 
         // Issue category checkboxes
         ArrayList<CategoryCheckBox> checkBoxes = new ArrayList<>();
@@ -135,14 +147,18 @@ public class AdminScene {
         // Add columns to TableView
         tableView.getColumns().addAll(issueIdCol, dateCol, roadCol, houseNumberCol, descriptionCol, categoryCol, statusCol, citizenEmailCol);
 
+        addContextMenuToTable(tableView);
+
 
         // Create a spacer to add space between the checkbox and the categories
         Label spacer = new Label();
         spacer.setPrefHeight(20); // Adjust height as needed
 
         VBox categoryLayout = new VBox(10);
+        categoryLayout.getChildren().addAll(statusLabel);
         categoryLayout.getChildren().addAll(showResolvedCheckbox, showCancelledCheckBox);
         categoryLayout.getChildren().addAll(spacer);
+        categoryLayout.getChildren().addAll(categoryLabel);
         categoryLayout.getChildren().addAll(checkBoxes);
         categoryLayout.getChildren().add(updateButton);
         categoryLayout.setAlignment(Pos.TOP_LEFT);
@@ -152,14 +168,76 @@ public class AdminScene {
         tablecatLay.setAlignment(Pos.TOP_LEFT);
         tablecatLay.setPadding(new Insets(10));
 
-        VBox mainLayout = new VBox(10, overskriftLab, underOverskriftLab, separator, tablecatLay,buttonAdvancedSettingsScene);
+        HBox advancedButton = new HBox(10,buttonAdvancedSettingsScene);
+        advancedButton.setAlignment(Pos.TOP_RIGHT);
+        advancedButton.setPadding(new Insets(10,40,10,10));
+
+
+        VBox mainLayout = new VBox(10, overskriftLab, underOverskriftLab, separator, advancedButton,tablecatLay);
         mainLayout.setPadding(new Insets(10));
         mainLayout.setAlignment(Pos.TOP_CENTER);
 
+
+
         // Set up the scene
-        scene = new Scene(mainLayout, 1200, 800);
+        scene = new Scene(mainLayout, 1030, 630);
 
         updateButton.setOnAction(e -> updateIssues(tableView, checkBoxes, showResolvedCheckbox, showCancelledCheckBox));
+    }
+
+
+    private void addContextMenuToTable(TableView<Issue> tableView) {
+
+        tableView.setRowFactory(tv -> {
+            TableRow<Issue> row = new TableRow<>();
+
+            // Create a ContextMenu for each row
+            ContextMenu contextMenu = new ContextMenu();
+
+            // Create "Copy to Clipboard" menu item
+            MenuItem copyItem = new MenuItem("Copy to Clipboard");
+            copyItem.setOnAction(event -> {
+                Issue selectedIssue = row.getItem(); // Get the issue for this row
+                if (selectedIssue != null) {
+                    copyToClipboard(selectedIssue); // Copy data to clipboard
+                }
+            });
+
+            // Add the menu item to the ContextMenu
+            contextMenu.getItems().add(copyItem);
+
+            // Show the context menu when the user right-clicks on a row
+            row.setOnMouseClicked(event -> {
+                if (event.getButton() == MouseButton.SECONDARY && !row.isEmpty()) {
+                    contextMenu.show(row, event.getScreenX(), event.getScreenY());
+                } else {
+                    contextMenu.hide();
+                }
+            });
+
+            return row;
+        });
+    }
+
+    // Method to copy issue details to clipboard
+    private void copyToClipboard(Issue issue) {
+        String issueDetails = "ID: " + issue.getIssueId() +
+                "\nDate: " + issue.getDate() +
+                "\nLocation: " + issue.getRoad() +" "+ issue.getHouseNumber()+
+                "\nDescription: " + issue.getDescription() +
+                "\nCategory: " + issue.getCategoryDisplayString();
+        Clipboard clipboard = Clipboard.getSystemClipboard();
+        ClipboardContent content = new ClipboardContent();
+        content.putString(issueDetails);
+        clipboard.setContent(content);
+
+
+
+//        // Optionally, show a confirmation alert
+//        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+//        alert.setTitle("Copied to Clipboard");
+//        alert.setContentText("Issue details have been copied to your clipboard.");
+//        alert.showAndWait();
     }
 
     public Scene getScene() {

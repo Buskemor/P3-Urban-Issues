@@ -94,7 +94,7 @@ public class AdvancedSettingsScene {
 
 
 
-        scene = new Scene(root, 1200, 800);
+        scene = new Scene(root, 1030, 630);
 
     }
 

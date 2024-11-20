@@ -57,7 +57,7 @@ public class WhoScene {
         mainLayout.setSpacing(120); // Spacing between the top and center parts
 
         // Create the scene using mainLayout as the root
-        scene = new Scene(mainLayout, 700, 600);
+        scene = new Scene(mainLayout, 1030, 630);
     }
 
     public Scene getScene() {

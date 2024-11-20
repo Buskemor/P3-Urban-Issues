@@ -28,14 +28,14 @@ and run the following init SQL query:
     category VARCHAR(30) NOT NULL
     );
     INSERT INTO categories(category)
-    VALUES('road'), ('vandalism'), ('electrical'), ('water'), ('obstruction'), ('other');
+    VALUES('road'), ('vandalism'), ('electrical'), ('water'), ('obstruction'), ('other'), ('deletedcategory');
     
     CREATE TABLE statuses (
     status_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     status VARCHAR(30) NOT NULL
     );
     INSERT INTO statuses(status)
-    VALUES('pending'), ('in_progress'), ('resolved');
+    VALUES('pending'), ('in_progress'), ('resolved'), ('cancelled');
     
     
     CREATE TABLE citizens(
