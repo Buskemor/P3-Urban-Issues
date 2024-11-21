@@ -2,6 +2,7 @@ package View;
 import Controller.DbAdmin;
 import Model.Citizen;
 import Controller.DbCitizen;
+
 import View.JavaFXExtensions.Title;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
@@ -49,12 +50,15 @@ public class IssueScene {
 
         Label categorylab= new Label("Category*:");
         categorylab.setStyle("-fx-font-size: 16px;");
+
         ComboBox<String> categoryBox = new ComboBox<>();
         categoryBox.setPrefWidth(400);
 
         // Adding items to the ComboBox
         for(Pair<Integer, String> category : categories) {
-            categoryBox.getItems().add(category.getValue());
+            if (!category.getValue().equalsIgnoreCase("deletedcategory")) {
+                categoryBox.getItems().add(category.getValue());
+            }
         }
 
         Label descriptionlab = new Label("Description*:");
@@ -137,7 +141,10 @@ public class IssueScene {
                     issueInserter = new DbCitizen(location, finalhousenumber, description, finalCategory, "root", "KENDATABASE123", "localhost", "3306", "issuesdb", new Citizen(email));
                 else
                     issueInserter = new DbCitizen(location, finalhousenumber, description, finalCategory, "root", "KENDATABASE123", "localhost", "3306", "issuesdb");
+
                 issueInserter.addIssueToDatabase();
+
+
 
                 app.setScene(app.getSceneConfirmation());
 
