@@ -140,7 +140,7 @@ public class IssueScene {
 
 
 
-                app.setScene(app.getSceneConfirmation());
+                app.setScene(app.getConfirmationScene());
 
                 System.out.println(finalCategory);
                 System.out.println(description);

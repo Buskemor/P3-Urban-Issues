@@ -29,10 +29,10 @@ public class WhoScene {
         whoAreYou.setStyle("-fx-font-size: 18px;");
 
         Button buttonCitizen = new Button("Citizen");
-        buttonCitizen.setOnAction(e -> app.setScene(app.getSceneIssue()));
+        buttonCitizen.setOnAction(e -> app.setScene(app.getIssueScene()));
 
         Button buttonAdmin = new Button("Administrator");
-        buttonAdmin.setOnAction(e -> app.setScene(app.getSceneAdmin()));
+        buttonAdmin.setOnAction(e -> app.setScene(app.getAdminScene()));
 
         HBox layout1 = new HBox(10);
         layout1.getChildren().addAll(buttonCitizen, buttonAdmin);

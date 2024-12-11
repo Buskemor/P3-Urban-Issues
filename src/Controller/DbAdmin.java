@@ -32,7 +32,8 @@ public class DbAdmin extends DbManager {
         ArrayList<Issue> issues = new ArrayList<>();
         try {
             PreparedStatement selectAllQuery = connection.prepareStatement(
-                "SELECT issues.issue_id, date, locations.road, locations.housenumber, locations.location_id, categories.category_id, categories.category, `description`, statuses.status_id, citizens.email " +
+                "SELECT issues.issue_id, date, locations.road, locations.housenumber, locations.location_id, " +
+                    "categories.category_id, categories.category, `description`, statuses.status_id, citizens.email " +
                     "FROM issues " +
                     "INNER JOIN locations ON locations.location_id = issues.location_id " +
                     "INNER JOIN statuses ON statuses.status_id = issues.status_id " +

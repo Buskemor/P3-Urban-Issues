@@ -6,8 +6,8 @@ import javafx.stage.Stage;
 
 public class UI2 extends Application {
 
-    Stage stage;
-    Scene sceneWho, sceneIssue, sceneAdmin, sceneConfirmation, sceneAdvancedSettings;
+    private Stage stage;
+    private Scene issueScene, adminScene, confirmationScene, advancedSettingsScene;
 
     public static void main(String[] args) {
         launch(args);
@@ -18,19 +18,13 @@ public class UI2 extends Application {
         stage = primaryStage;
         primaryStage.setTitle("Urban Issues");
 
-        WhoScene whoScene = new WhoScene(this);
-        IssueScene issueScene = new IssueScene(this);
-        AdminScene adminScene = new AdminScene(this);
-        ConfirmationScene confirmationScene = new ConfirmationScene(this);
-        AdvancedSettingsScene advancedSettingsScene = new AdvancedSettingsScene(this);
+        Scene whoScene = new WhoScene(this).getScene();
+        issueScene = new IssueScene(this).getScene();
+        adminScene = new AdminScene(this).getScene();
+        confirmationScene = new ConfirmationScene(this).getScene();
+        advancedSettingsScene = new AdvancedSettingsScene(this).getScene();
 
-        sceneWho = whoScene.getScene();
-        sceneIssue = issueScene.getScene();
-        sceneAdmin = adminScene.getScene();
-        sceneConfirmation = confirmationScene.getScene();
-        sceneAdvancedSettings = advancedSettingsScene.getScene();
-
-        primaryStage.setScene(sceneWho);
+        primaryStage.setScene(whoScene);
         primaryStage.show();
     }
 
@@ -38,24 +32,19 @@ public class UI2 extends Application {
         stage.setScene(scene);
     }
 
-    public Scene getSceneWho() {
-        return sceneWho;
+    public Scene getIssueScene() {
+        return issueScene;
     }
 
-    public Scene getSceneIssue() {
-        return sceneIssue;
+    public Scene getAdminScene() {
+        return adminScene;
     }
 
-    public Scene getSceneAdmin() {
-        return sceneAdmin;
+    public Scene getConfirmationScene() {
+        return confirmationScene;
     }
 
-    public Scene getSceneConfirmation() {
-    return sceneConfirmation;
-}
-
-    public Scene getSceneAdvancedSettings() {
-        return sceneAdvancedSettings;
+    public Scene getAdvancedSettingsScene() {
+        return advancedSettingsScene;
     }
 }
-

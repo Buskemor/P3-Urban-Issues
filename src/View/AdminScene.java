@@ -101,7 +101,7 @@ public class AdminScene {
         categoryCol.setSortable(true);
 
         Button buttonAdvancedSettingsScene = new Button("Go to Advanced Settings");
-        buttonAdvancedSettingsScene.setOnAction(e -> app.setScene(app.getSceneAdvancedSettings()));
+        buttonAdvancedSettingsScene.setOnAction(e -> app.setScene(app.getAdvancedSettingsScene()));
 
 
         TableColumn<Issue, Status> statusCol = new TableColumn<>("Status");
