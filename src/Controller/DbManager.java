@@ -24,3 +24,4 @@ public abstract class DbManager {
         }
     }
 }
+

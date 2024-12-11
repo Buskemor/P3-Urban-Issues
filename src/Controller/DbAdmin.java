@@ -7,54 +7,6 @@ import java.sql.*;
 import java.util.ArrayList;
 
 public class DbAdmin extends DbManager {
-    public static void main(String[] args) {
-
-//        issueInserter = new DbInserter(location, finalhousenumber, description, finalCategory, new Citizen(email));
-
-        DbAdmin ta = new DbAdmin("root", "KENDATABASE123", "localhost", "3306", "issuesdb");
-        System.out.println(ta.fetchCategories());
-//        DbInserter = new DbInserter(new Issue())
-
-//        ArrayList<Issue> gg = ta.fetchAllIssues();
-
-//        for (Issue element : gg) {
-//            System.out.println("Date: " + element.getDate());
-//            System.out.println("Status: " + element.getStatus());
-//            System.out.println("Road: " + element.getRoad());
-//            System.out.println("House Number: " + element.getHouseNumber());
-//            System.out.println("Description: " + element.getDescription());
-//            System.out.println("Category: " + element.getCategory().getValue());
-//            System.out.println("Reported By: " + element.getReportedBy());
-//            System.out.println("Issue ID: " + element.getIssueId());
-//            System.out.println(); // Blank line for readability between elements
-//        }
-
-//        for(Pair<Integer, String> cat : ta.categories) {
-//            System.out.println(cat);
-//        }
-
-//        ArrayList<Issue> tata = new ArrayList<>();
-//        ArrayList<Pair<Integer, String>> ta2 = new ArrayList<>();
-//        ta2.add(new Pair<>(1, "Other"));
-//
-//        tata = ta.fetchIssuesByCategories(ta2);
-//
-//        for(Issue issue : tata)
-//            System.out.println(issue.getIssueId() + " " + issue.getCategory());
-
-//        ArrayList<Category> cats = new ArrayList<Category>();
-//        cats.add(Category.ELECTRICAL);
-//        cats.add(Category.OBSTRUCTION);
-//
-//        ArrayList<Issue> issuesOfCat = ta.fetchIssuesByCategories(cats);
-//
-//        for(Issue element : issuesOfCat) {
-//            System.out.println(element.getCategory());
-//        }
-
-
-    }
-
     public DbAdmin(String username, String password, String ip, String port, String schema) {
         super(username, password, ip, port, schema);
     }
@@ -76,7 +28,7 @@ public class DbAdmin extends DbManager {
         }
     }
 
-    private ArrayList<Issue> fetchAllIssues() {
+    public ArrayList<Issue> fetchAllIssues() {
         ArrayList<Issue> issues = new ArrayList<>();
         try {
             PreparedStatement selectAllQuery = connection.prepareStatement(
@@ -146,7 +98,6 @@ public class DbAdmin extends DbManager {
             while(result.next()) {
                 categories.add(new Pair<>(
                     result.getInt("category_id"),
-//                    Make the first letter in the category upper case
                     result.getString("category").substring(0,1).toUpperCase()+result.getString("category").substring(1))
                 );
             }
@@ -170,14 +121,14 @@ public class DbAdmin extends DbManager {
         }
     }
 
-    public ArrayList<Issue> fetchIssuesByCategories(ArrayList<Pair<Integer, String>> selectedCategories) {
-        ArrayList<Issue> issues = new ArrayList<>();
-        for(Issue issue : this.fetchAllIssues())
+    public ArrayList<Issue> fetchIssuesByCategories(ArrayList<Pair<Integer, String>> selectedCategories, ArrayList<Issue> issues) {
+        ArrayList<Issue> issuestemp = new ArrayList<>();
+        for(Issue issue : issues)
             for(Pair<Integer, String> category : selectedCategories)
-                if(issue.getCategory().equals(category))
-                    issues.add(issue);
+                if (issue.getCategory().equals(category))
+                    issuestemp.add(issue);
 
-        return issues;
+        return issuestemp;
     }
 
     public boolean checkIfCategoryHasIssues(String categoryName) {
@@ -201,7 +152,6 @@ public class DbAdmin extends DbManager {
         try {
             connection.setAutoCommit(false); // Begin transaction
 
-            // Check if category exists
             PreparedStatement categoryCheckStmt = connection.prepareStatement(
                     "SELECT category_id FROM categories WHERE category = ?");
             categoryCheckStmt.setString(1, categoryName);
@@ -214,7 +164,6 @@ public class DbAdmin extends DbManager {
 
             int categoryId = result.getInt("category_id");
 
-            // Reassign issues to "DeletedCategory" if they exist
             PreparedStatement reassignStmt = connection.prepareStatement(
                     "UPDATE issues SET category_id = " +
                             "(SELECT category_id FROM categories WHERE category = 'deletedcategory') " +
@@ -222,7 +171,6 @@ public class DbAdmin extends DbManager {
             reassignStmt.setInt(1, categoryId);
             reassignStmt.executeUpdate();
 
-            // Delete the category
             System.out.println(categoryId);
             PreparedStatement deleteStmt = connection.prepareStatement(
                     "DELETE FROM categories WHERE category_id = ?");
@@ -235,14 +183,14 @@ public class DbAdmin extends DbManager {
 
         } catch (SQLException e) {
             try {
-                connection.rollback(); // Rollback transaction on error
+                connection.rollback();
             } catch (SQLException rollbackEx) {
                 System.out.println("Rollback failed: " + rollbackEx.getMessage());
             }
             System.out.println("Error deleting category: " + e.getMessage());
             } finally {
             try {
-                connection.setAutoCommit(true); // Reset auto-commit
+                connection.setAutoCommit(true);
             } catch (SQLException e) {
                 System.out.println("Failed to reset auto-commit: " + e.getMessage());
             }

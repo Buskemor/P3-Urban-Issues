@@ -32,18 +32,19 @@ public class AdminScene {
     private Scene scene;
     private DbAdmin dbAdmin;
     private ArrayList<Pair<Integer, String>> categories;
+    private ArrayList<Issue> issues;
 
 
     public AdminScene(UI2 app) {
         this.app = app;
         this.dbAdmin = new DbAdmin("root", "KENDATABASE123", "localhost", "3306", "issuesdb");
         this.categories = dbAdmin.fetchCategories();
+        this.issues = dbAdmin.fetchAllIssues();
         createScene();
     }
 
 
     private void createScene() {
-        // Existing labels and layout components
         Title overskriftLab = new Title("URBAN ISSUE REPORTING");
 
         SubTitle underOverskriftLab = new SubTitle("''Your City, Your Voice, Your Impact''");
@@ -58,7 +59,6 @@ public class AdminScene {
         Label categoryLabel = new Label("Category filter");
         categoryLabel.setStyle("-fx-font-weight: bold;");
 
-        // Issue category checkboxes
         ArrayList<CategoryCheckBox> checkBoxes = new ArrayList<>();
         for(Pair<Integer, String> category : categories) {
             checkBoxes.add(new CategoryCheckBox(category.getKey(), category.getValue()));
@@ -66,15 +66,14 @@ public class AdminScene {
         CheckBox showResolvedCheckbox = new CheckBox("Resolved Issues");
         CheckBox showCancelledCheckBox = new CheckBox("Cancelled Issues");
 
-        // "Update" button to fetch and display issues
         Button updateButton = new Button("Update");
 
-        // Create TableView and set its data
+
         TableView<Issue> tableView = new TableView<>();
         updateIssues(tableView, checkBoxes, showResolvedCheckbox, showCancelledCheckBox);
         tableView.setPrefWidth(820);
 
-        // Create columns
+
         TableColumn<Issue, Integer> issueIdCol = new TableColumn<>("ID");
         issueIdCol.setCellValueFactory(new PropertyValueFactory<>("issueId"));
         issueIdCol.setSortable(true);
@@ -109,7 +108,6 @@ public class AdminScene {
         statusCol.setCellValueFactory(new PropertyValueFactory<>("status"));
         statusCol.setSortable(true);
 
-        // Setting a ComboBox as a cell editor for the Status column
         statusCol.setCellFactory(column -> new TableCell<>() {
             private final ComboBox<Status> statusDropdown = new ComboBox<>(FXCollections.observableArrayList(Status.values()));
 
@@ -129,8 +127,8 @@ public class AdminScene {
                 if (empty || status == null) {
                     setGraphic(null);
                 } else {
-                    statusDropdown.setValue(status); // Set current status
-                    setGraphic(statusDropdown); // Display ComboBox in cell
+                    statusDropdown.setValue(status);
+                    setGraphic(statusDropdown);
                 }
             }
         });
@@ -144,15 +142,13 @@ public class AdminScene {
         citizenEmailCol.setSortable(true);
         citizenEmailCol.setPrefWidth(150);
 
-        // Add columns to TableView
         tableView.getColumns().addAll(issueIdCol, dateCol, roadCol, houseNumberCol, descriptionCol, categoryCol, statusCol, citizenEmailCol);
 
         addContextMenuToTable(tableView);
 
 
-        // Create a spacer to add space between the checkbox and the categories
-        Label spacer = new Label();
-        spacer.setPrefHeight(20); // Adjust height as needed
+        Label spacer = new Label(); // can we use something other than label?
+        spacer.setPrefHeight(20);
 
         VBox categoryLayout = new VBox(10);
         categoryLayout.getChildren().addAll(statusLabel);
@@ -178,8 +174,6 @@ public class AdminScene {
         mainLayout.setAlignment(Pos.TOP_CENTER);
 
 
-
-        // Set up the scene
         scene = new Scene(mainLayout, 1030, 630);
 
         updateButton.setOnAction(e -> updateIssues(tableView, checkBoxes, showResolvedCheckbox, showCancelledCheckBox));
@@ -191,22 +185,18 @@ public class AdminScene {
         tableView.setRowFactory(tv -> {
             TableRow<Issue> row = new TableRow<>();
 
-            // Create a ContextMenu for each row
             ContextMenu contextMenu = new ContextMenu();
 
-            // Create "Copy to Clipboard" menu item
             MenuItem copyItem = new MenuItem("Copy to Clipboard");
             copyItem.setOnAction(event -> {
-                Issue selectedIssue = row.getItem(); // Get the issue for this row
+                Issue selectedIssue = row.getItem();
                 if (selectedIssue != null) {
-                    copyToClipboard(selectedIssue); // Copy data to clipboard
+                    copyToClipboard(selectedIssue);
                 }
             });
 
-            // Add the menu item to the ContextMenu
             contextMenu.getItems().add(copyItem);
 
-            // Show the context menu when the user right-clicks on a row
             row.setOnMouseClicked(event -> {
                 if (event.getButton() == MouseButton.SECONDARY && !row.isEmpty()) {
                     contextMenu.show(row, event.getScreenX(), event.getScreenY());
@@ -219,7 +209,6 @@ public class AdminScene {
         });
     }
 
-    // Method to copy issue details to clipboard
     private void copyToClipboard(Issue issue) {
         String issueDetails = "ID: " + issue.getIssueId() +
                 "\nDate: " + issue.getDate() +
@@ -230,21 +219,13 @@ public class AdminScene {
         ClipboardContent content = new ClipboardContent();
         content.putString(issueDetails);
         clipboard.setContent(content);
-
-
-
-//        // Optionally, show a confirmation alert
-//        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-//        alert.setTitle("Copied to Clipboard");
-//        alert.setContentText("Issue details have been copied to your clipboard.");
-//        alert.showAndWait();
     }
 
     public Scene getScene() {
         return scene;
     }
 
-    // Method to update issues in the tableView based on selected categories
+
     private void updateIssues(TableView<Issue> tableView, ArrayList<CategoryCheckBox> checkBoxes, CheckBox showResolvedCheckbox, CheckBox showCancelledCheckBox) {
         ArrayList<Pair<Integer, String>> selectedCategories = new ArrayList<>();
 
@@ -257,35 +238,35 @@ public class AdminScene {
         if(selectedCategories.isEmpty())
             selectedCategories.addAll(categories);
 
-        ObservableList<Issue> issues = getIssueData(selectedCategories, showResolvedCheckbox.isSelected(), showCancelledCheckBox.isSelected());
-        tableView.setItems(issues);
+        ObservableList<Issue> observableIssues = getIssueData(selectedCategories, showResolvedCheckbox.isSelected(), showCancelledCheckBox.isSelected());
+        tableView.setItems(observableIssues);
     }
 
     private ObservableList<Issue> getIssueData(ArrayList<Pair<Integer, String>> selectedCategories, boolean showResolved, boolean showCancelled){
 //        TODO: MAKE THIS ARRAYLIST AN ATTRIBUTE
-        ArrayList<Issue> issues = dbAdmin.fetchIssuesByCategories(selectedCategories);
-        System.out.println(issues);
+        ArrayList<Issue> issuesOfCategory = dbAdmin.fetchIssuesByCategories(selectedCategories, issues);
+        System.out.println(issuesOfCategory);
 
         if(!showResolved)
-            issues.removeIf(issue -> issue.getStatus() == Status.RESOLVED);
+            issuesOfCategory.removeIf(issue -> issue.getStatus() == Status.RESOLVED);
         if(!showCancelled)
-            issues.removeIf(issue -> issue.getStatus() == Status.CANCELLED);
+            issuesOfCategory.removeIf(issue -> issue.getStatus() == Status.CANCELLED);
 
         if(showResolved && showCancelled) {
-            issues.removeIf(issue -> (issue.getStatus() != Status.RESOLVED && issue.getStatus() != Status.CANCELLED));
+            issuesOfCategory.removeIf(issue -> (issue.getStatus() != Status.RESOLVED && issue.getStatus() != Status.CANCELLED));
             System.out.println("both are true");
             return FXCollections.observableArrayList(
-                    issues
+                    issuesOfCategory
             );
         }
 
         if(showResolved)
-            issues.removeIf(issue -> issue.getStatus() != Status.RESOLVED);
+            issuesOfCategory.removeIf(issue -> issue.getStatus() != Status.RESOLVED);
         if(showCancelled)
-            issues.removeIf(issue -> issue.getStatus() != Status.CANCELLED);
+            issuesOfCategory.removeIf(issue -> issue.getStatus() != Status.CANCELLED);
 
         return FXCollections.observableArrayList(
-                issues
+            issuesOfCategory
         );
     }
 }

@@ -33,9 +33,8 @@ public class AdvancedSettingsScene {
         SubTitle underOverskriftLab = new SubTitle("''Your City, Your Voice, Your Impact''");
 
 
-        // Create Separator
         Separator separator = new Separator();
-        separator.setPrefWidth(700); // Adjust the width to match your scene width
+        separator.setPrefWidth(700);
 
         TextField newCategoryField = new TextField();
         newCategoryField.setPromptText("Enter new category name");
@@ -48,8 +47,6 @@ public class AdvancedSettingsScene {
         buttonAdmin.setOnAction(e -> app.setScene(new AdminScene(app).getScene()));
 
 
-//        TextField deleteCategoryField = new TextField();
-//        deleteCategoryField.setPromptText("Enter category name to delete");
         Button deleteCategoryButton = new Button("Delete Category");
         deleteCategoryButton.setPrefWidth(120);
 
@@ -83,10 +80,10 @@ public class AdvancedSettingsScene {
         DeleteCatLayout.setAlignment(Pos.TOP_CENTER); // Centered at the top
 
 
-        VBox headerLayout = new VBox(10); // 10px spacing
+        VBox headerLayout = new VBox(10);
         headerLayout.getChildren().addAll(overskriftLab, underOverskriftLab,separator,AddCatLayout,DeleteCatLayout,buttonAdmin);
         headerLayout.setPadding(new javafx.geometry.Insets(10, 0, 0, 0));
-        headerLayout.setAlignment(Pos.TOP_CENTER); // Centered at the top
+        headerLayout.setAlignment(Pos.TOP_CENTER);
 
 
         BorderPane root = new BorderPane();
@@ -164,8 +161,8 @@ public class AdvancedSettingsScene {
             }
 
             newCategoryField.clear();
-            categories = dbAdmin.fetchCategories(); // Update the category list
-            // add functionality so that the user can see the newly created category:
+            categories = dbAdmin.fetchCategories();
+            // the user can see the newly created category:
             Alert alert = new Alert(Alert.AlertType.WARNING);
             alert.setTitle("Success");
             alert.setHeaderText(null); //default is WARNING

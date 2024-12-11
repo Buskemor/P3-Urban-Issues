@@ -28,14 +28,13 @@ public class ConfirmationScene {
         SubTitle underOverskriftLab = new SubTitle("''Your City, Your Voice, Your Impact''");
 //        underOverskriftLab.setStyle("-fx-font-size: 20px;");
 
-        // Create Separator
         Separator separator = new Separator();
-        separator.setPrefWidth(700); // Adjust the width to match your scene width
+        separator.setPrefWidth(700);
 
-        Image image = new Image(getClass().getResource("confirmation.png").toExternalForm()); // Replace with your image file path
+        Image image = new Image(getClass().getResource("confirmation.png").toExternalForm());
         ImageView imageView = new ImageView(image);
-        imageView.setFitWidth(150); // Adjust the width as needed
-        imageView.setPreserveRatio(true); // Maintain the aspect ratio of the image
+        imageView.setFitWidth(150);
+        imageView.setPreserveRatio(true);
 
 
         Label thanklab = new Label("Thank you!");
@@ -47,15 +46,15 @@ public class ConfirmationScene {
         Label referlab = new Label("Please refer to your email for our response");
         referlab.setStyle("-fx-font-size: 16px;");
 
-        VBox centerLayout = new VBox(10); // 10px spacing
+        VBox centerLayout = new VBox(10);
         centerLayout.getChildren().addAll(imageView,thanklab,submitlab,referlab);
         centerLayout.setPadding(new javafx.geometry.Insets(10, 0, 0, 0));
-        centerLayout.setAlignment(Pos.CENTER); // Centered at the top
+        centerLayout.setAlignment(Pos.CENTER);
 
-        VBox headerLayout = new VBox(10); // 10px spacing
+        VBox headerLayout = new VBox(10);
         headerLayout.getChildren().addAll(overskriftLab, underOverskriftLab,separator);
         headerLayout.setPadding(new javafx.geometry.Insets(10, 0, 0, 0));
-        headerLayout.setAlignment(Pos.TOP_CENTER); // Centered at the top
+        headerLayout.setAlignment(Pos.TOP_CENTER);
 
 
         BorderPane root = new BorderPane();

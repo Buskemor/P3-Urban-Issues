@@ -36,11 +36,9 @@ public class IssueScene {
     private void createScene() {
         Title header = new Title("Urban Issue Reporting");
 
-        // Create Separator
         Separator separator = new Separator();
-        separator.setPrefWidth(700); // Adjust the width to match your scene width
+        separator.setPrefWidth(700);
 
-        // Create Body Content
         Label overskrift = new Label("Report an issue");
         overskrift.setStyle("-fx-font-size: 20px;-fx-font-weight: bold;");
 
@@ -54,7 +52,6 @@ public class IssueScene {
         ComboBox<String> categoryBox = new ComboBox<>();
         categoryBox.setPrefWidth(400);
 
-        // Adding items to the ComboBox
         for(Pair<Integer, String> category : categories) {
             if (!category.getValue().equalsIgnoreCase("deletedcategory")) {
                 categoryBox.getItems().add(category.getValue());
@@ -65,6 +62,7 @@ public class IssueScene {
         descriptionlab.setStyle("-fx-font-size: 16px;");
         TextField descriptiontext = new TextField();
 
+//        for images if we have time, remember to make space in the grid:
 //        Label imagelab = new Label("Image:");
 //        imagelab.setStyle("-fx-font-size: 16px;");
 
@@ -95,7 +93,6 @@ public class IssueScene {
             emailtext.setManaged(newValue);
         });
 
-// Initially hide the email label and text field
         emaillab.setVisible(false);
         emaillab.setManaged(false);
         emailtext.setVisible(false);
@@ -104,7 +101,6 @@ public class IssueScene {
 
         Button submitknap= new Button("Submit");
         submitknap.setOnAction(e -> {
-            //Retrieving data
             String category = categoryBox.getValue();
             String description = descriptiontext.getText();
             String location = locationtext.getText();
@@ -114,9 +110,7 @@ public class IssueScene {
 
 
 
-            // Check if required fields are filled
             if (category == null || description.isEmpty() || location.isEmpty() || !houseNumber.matches("\\d+")) {
-                // Alert user if any required field is missing
                 Alert alert = new Alert(Alert.AlertType.WARNING);
                 alert.setTitle("Missing Information");
                 alert.setHeaderText(null);
@@ -124,10 +118,8 @@ public class IssueScene {
                 alert.showAndWait();
 
             } else {
-                // Print information to console
                 int finalhousenumber = Integer.parseInt(houseNumber);
 
-//                String tempcategory = category.toUpperCase(); //going to use this code in DbManager
                 Pair<Integer, String> finalCategory = null;
 
                 for(Pair<Integer, String> categoryPair : categories) {
@@ -138,9 +130,11 @@ public class IssueScene {
                 DbCitizen issueInserter = null;
 
                 if (feedbackBox.isSelected())
-                    issueInserter = new DbCitizen(location, finalhousenumber, description, finalCategory, "root", "KENDATABASE123", "localhost", "3306", "issuesdb", new Citizen(email));
+                    issueInserter = new DbCitizen(location, finalhousenumber, description, finalCategory,"root",
+                    "KENDATABASE123", "localhost", "3306", "issuesdb", new Citizen(email));
                 else
-                    issueInserter = new DbCitizen(location, finalhousenumber, description, finalCategory, "root", "KENDATABASE123", "localhost", "3306", "issuesdb");
+                    issueInserter = new DbCitizen(location, finalhousenumber, description, finalCategory, "root",
+                    "KENDATABASE123", "localhost", "3306", "issuesdb");
 
                 issueInserter.addIssueToDatabase();
 
@@ -166,8 +160,6 @@ public class IssueScene {
 
         grid.add(descriptionlab,1,7,1,1);
         grid.add(descriptiontext,2,7,7,1);
-
-//        grid.add(imagelab,1,8,1,1);
 
         grid.add(locationlab,1,8,1,1);
         grid.add(locationtext,2,8,5,1);
@@ -209,10 +201,10 @@ public class IssueScene {
         VBox contentBox = new VBox(10,grid);
         contentBox.setAlignment(Pos.TOP_CENTER);
 
-        VBox headerLayout = new VBox(10); // 10px spacing
+        VBox headerLayout = new VBox(10);
         headerLayout.getChildren().addAll(header, separator,overskrift, underoverskrift);
         headerLayout.setPadding(new Insets(10, 0, 0, 0));
-        headerLayout.setAlignment(Pos.TOP_CENTER); // Centered at the top
+        headerLayout.setAlignment(Pos.TOP_CENTER);
 
 
         BorderPane root = new BorderPane();
@@ -220,7 +212,6 @@ public class IssueScene {
         root.setCenter(contentBox);
 
 
-        // Create the Scene
         scene = new Scene(root, 700, 600);
     }
 

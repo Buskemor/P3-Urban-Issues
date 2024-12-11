@@ -18,8 +18,6 @@ public class DbCitizen extends DbManager {
     private int houseNumber;
     public int locationId;
 
-//    new DbCitizen(12,2,2,,2,2,2,2, )
-
     public DbCitizen (String road, int houseNumber, String description, Pair<Integer, String> category,
                       String username, String password, String ip, String port, String schema,
                       Citizen citizen) {
