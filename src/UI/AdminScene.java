@@ -1,10 +1,10 @@
-package View;
+package UI;
 
-import Model.*;
-import Controller.DbAdmin;
+import IssueStructure.*;
+import Database.DbFetcher;
 
-import View.JavaFXExtensions.SubTitle;
-import View.JavaFXExtensions.Title;
+import UI.JavaFXExtensions.SubTitle;
+import UI.JavaFXExtensions.Title;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -28,18 +28,18 @@ import java.util.Date;
 
 public class AdminScene {
 
-    private UI2 app;
+    private UIManager app;
     private Scene scene;
-    private DbAdmin dbAdmin;
+    private DbFetcher dbFetcher;
     private ArrayList<Pair<Integer, String>> categories;
     private ArrayList<Issue> issues;
 
 
-    public AdminScene(UI2 app) {
+    public AdminScene(UIManager app) {
         this.app = app;
-        this.dbAdmin = new DbAdmin("root", "KENDATABASE123", "localhost", "3306", "issuesdb");
-        this.categories = dbAdmin.fetchCategories();
-        this.issues = dbAdmin.fetchAllIssues();
+        this.dbFetcher = new DbFetcher("root", "KENDATABASE123", "localhost", "3306", "issuesdb");
+        this.categories = dbFetcher.fetchCategories();
+        this.issues = dbFetcher.fetchAllIssues();
         createScene();
     }
 
@@ -115,7 +115,7 @@ public class AdminScene {
                 statusDropdown.setOnAction(event -> {
                     Status newStatus = statusDropdown.getValue();
                     Issue currentIssue = getTableView().getItems().get(getIndex());
-                    dbAdmin.updateIssueStatus(currentIssue, newStatus); // Update in DB
+                    dbFetcher.updateIssueStatus(currentIssue, newStatus); // Update in DB
                     currentIssue.setStatus(newStatus); // Update in the model
                     getTableView().refresh(); // Refresh table to show updated status maybe doesnt do anything
                 });
@@ -243,9 +243,7 @@ public class AdminScene {
     }
 
     private ObservableList<Issue> getIssueData(ArrayList<Pair<Integer, String>> selectedCategories, boolean showResolved, boolean showCancelled){
-//        TODO: MAKE THIS ARRAYLIST AN ATTRIBUTE
-        ArrayList<Issue> issuesOfCategory = dbAdmin.fetchIssuesByCategories(selectedCategories, issues);
-        System.out.println(issuesOfCategory);
+        ArrayList<Issue> issuesOfCategory = dbFetcher.fetchIssuesByCategories(selectedCategories, issues);
 
         if(!showResolved)
             issuesOfCategory.removeIf(issue -> issue.getStatus() == Status.RESOLVED);

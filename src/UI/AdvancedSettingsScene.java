@@ -1,8 +1,8 @@
-package View;
+package UI;
 
-import Controller.DbAdmin;
-import View.JavaFXExtensions.SubTitle;
-import View.JavaFXExtensions.Title;
+import Database.DbFetcher;
+import UI.JavaFXExtensions.SubTitle;
+import UI.JavaFXExtensions.Title;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -14,16 +14,16 @@ import javafx.util.Pair;
 import java.util.ArrayList;
 
 public class AdvancedSettingsScene {
-    private UI2 app;
+    private UIManager app;
     private Scene scene;
-    private DbAdmin dbAdmin;
+    private DbFetcher dbFetcher;
     private ArrayList<Pair<Integer, String>> categories;
 
 
-    public AdvancedSettingsScene(UI2 app) {
+    public AdvancedSettingsScene(UIManager app) {
         this.app = app;
-        this.dbAdmin = new DbAdmin("root", "KENDATABASE123", "localhost", "3306", "issuesdb");
-        this.categories = dbAdmin.fetchCategories();
+        this.dbFetcher = new DbFetcher("root", "KENDATABASE123", "localhost", "3306", "issuesdb");
+        this.categories = dbFetcher.fetchCategories();
         createScene();
     }
 
@@ -104,12 +104,12 @@ public class AdvancedSettingsScene {
         initialConfirmation.showAndWait().ifPresent(response -> {
             if (response != ButtonType.OK)
                 return;
-            boolean hasAssociatedIssues = dbAdmin.checkIfCategoryHasIssues(categoryToDelete);
+            boolean hasAssociatedIssues = dbFetcher.checkIfCategoryHasIssues(categoryToDelete);
             if (hasAssociatedIssues) {
                 confirmIssueDeletion(categoryToDelete);
                 return;
             }
-            boolean canDeleteCategory = dbAdmin.deleteCategory(categoryToDelete);
+            boolean canDeleteCategory = dbFetcher.deleteCategory(categoryToDelete);
             if (canDeleteCategory) {
                 showAlert("Success", "The category was successfully deleted.", Alert.AlertType.INFORMATION);
                 return;
@@ -126,7 +126,7 @@ public class AdvancedSettingsScene {
 
         secondaryConfirmation.showAndWait().ifPresent(secondResponse -> {
             if (secondResponse == ButtonType.OK) {
-                boolean canDeleteCategory = dbAdmin.deleteCategory(categoryToDelete);
+                boolean canDeleteCategory = dbFetcher.deleteCategory(categoryToDelete);
                 if (canDeleteCategory) {
                     showAlert("Success", "The category and associated issues were successfully updated.", Alert.AlertType.INFORMATION);
                     return;
@@ -151,7 +151,7 @@ public class AdvancedSettingsScene {
                 return;
             }
 
-            if(!dbAdmin.addNewCategory(newCategoryName)) {
+            if(!dbFetcher.addNewCategory(newCategoryName)) {
                 Alert alert = new Alert(Alert.AlertType.WARNING);
                 alert.setTitle("Success");
                 alert.setHeaderText(null); //default is WARNING
@@ -161,7 +161,7 @@ public class AdvancedSettingsScene {
             }
 
             newCategoryField.clear();
-            categories = dbAdmin.fetchCategories();
+            categories = dbFetcher.fetchCategories();
             // the user can see the newly created category:
             Alert alert = new Alert(Alert.AlertType.WARNING);
             alert.setTitle("Success");

@@ -1,4 +1,4 @@
-package View.JavaFXExtensions;
+package UI.JavaFXExtensions;
 
 import javafx.scene.control.Label;
 

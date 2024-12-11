@@ -1,4 +1,4 @@
-package Model;
+package IssueStructure;
 
 public enum Status {
     PENDING,

@@ -1,10 +1,10 @@
-package View;
+package UI;
 
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
-public class UI2 extends Application {
+public class UIManager extends Application {
 
     private Stage stage;
     private Scene issueScene, adminScene, confirmationScene, advancedSettingsScene;

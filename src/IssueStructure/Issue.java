@@ -1,4 +1,4 @@
-package Model;
+package IssueStructure;
 
 import javafx.util.Pair;
 

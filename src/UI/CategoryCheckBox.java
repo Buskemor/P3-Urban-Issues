@@ -1,4 +1,4 @@
-package View;
+package UI;
 
 import javafx.scene.control.CheckBox;
 

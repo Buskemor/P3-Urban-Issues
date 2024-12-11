@@ -1,13 +1,13 @@
-package Controller;
+package Database;
 
-import Model.*;
+import IssueStructure.*;
 import javafx.util.Pair;
 
 import java.sql.*;
 import java.util.Date;
 
 
-public class DbCitizen extends DbManager {
+public class DbInserter extends DbManager {
     private Pair<Integer, String> category;
 
     private String description;
@@ -18,7 +18,7 @@ public class DbCitizen extends DbManager {
     private int houseNumber;
     public int locationId;
 
-    public DbCitizen (String road, int houseNumber, String description, Pair<Integer, String> category,
+    public DbInserter(String road, int houseNumber, String description, Pair<Integer, String> category,
                       String username, String password, String ip, String port, String schema,
                       Citizen citizen) {
         super(username, password, ip, port, schema);
@@ -31,8 +31,8 @@ public class DbCitizen extends DbManager {
             this.email = citizen.getEmail();
     }
 
-    public DbCitizen(String road, int houseNumber, String description, Pair<Integer, String> category,
-                     String username, String password, String ip, String port, String schema) {
+    public DbInserter(String road, int houseNumber, String description, Pair<Integer, String> category,
+                      String username, String password, String ip, String port, String schema) {
         this(road, houseNumber, description, category, username, password, ip, port, schema, null);
     }
 

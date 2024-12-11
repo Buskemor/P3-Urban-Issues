@@ -1,9 +1,9 @@
-package View;
-import Controller.DbAdmin;
-import Model.Citizen;
-import Controller.DbCitizen;
+package UI;
+import Database.DbFetcher;
+import IssueStructure.Citizen;
+import Database.DbInserter;
 
-import View.JavaFXExtensions.Title;
+import UI.JavaFXExtensions.Title;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
@@ -17,9 +17,9 @@ import java.util.ArrayList;
 
 public class IssueScene {
 
-    private UI2 app;
+    private UIManager app;
     private Scene scene;
-    private ArrayList<Pair<Integer, String>> categories = new DbAdmin(
+    private ArrayList<Pair<Integer, String>> categories = new DbFetcher(
             "root",
             "KENDATABASE123",
             "localhost",
@@ -28,7 +28,7 @@ public class IssueScene {
     ).fetchCategories();
 
 
-    public IssueScene(UI2 app) {
+    public IssueScene(UIManager app) {
         this.app = app;
         createScene();
     }
@@ -127,13 +127,13 @@ public class IssueScene {
                         finalCategory = categoryPair;
                 }
 
-                DbCitizen issueInserter = null;
+                DbInserter issueInserter = null;
 
                 if (feedbackBox.isSelected())
-                    issueInserter = new DbCitizen(location, finalhousenumber, description, finalCategory,"root",
+                    issueInserter = new DbInserter(location, finalhousenumber, description, finalCategory,"root",
                     "KENDATABASE123", "localhost", "3306", "issuesdb", new Citizen(email));
                 else
-                    issueInserter = new DbCitizen(location, finalhousenumber, description, finalCategory, "root",
+                    issueInserter = new DbInserter(location, finalhousenumber, description, finalCategory, "root",
                     "KENDATABASE123", "localhost", "3306", "issuesdb");
 
                 issueInserter.addIssueToDatabase();

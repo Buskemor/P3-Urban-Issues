@@ -1,7 +1,7 @@
-package View;
+package UI;
 
 
-import View.JavaFXExtensions.*;
+import UI.JavaFXExtensions.*;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
@@ -12,11 +12,11 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 
 public class ConfirmationScene {
-    private UI2 app;
+    private UIManager app;
     private Scene scene;
 
 
-    public ConfirmationScene(UI2 app) {
+    public ConfirmationScene(UIManager app) {
         this.app = app;
         createScene();
     }

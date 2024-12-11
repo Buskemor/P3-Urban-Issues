@@ -1,13 +1,13 @@
-package Controller;
+package Database;
 
-import Model.*;
+import IssueStructure.*;
 import javafx.util.Pair;
 
 import java.sql.*;
 import java.util.ArrayList;
 
-public class DbAdmin extends DbManager {
-    public DbAdmin(String username, String password, String ip, String port, String schema) {
+public class DbFetcher extends DbManager {
+    public DbFetcher(String username, String password, String ip, String port, String schema) {
         super(username, password, ip, port, schema);
     }
 

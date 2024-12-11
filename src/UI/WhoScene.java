@@ -1,6 +1,6 @@
-package View;
+package UI;
 
-import View.JavaFXExtensions.*;
+import UI.JavaFXExtensions.*;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -10,10 +10,10 @@ import javafx.scene.layout.VBox;
 
 public class WhoScene {
 
-    private UI2 app;
+    private UIManager app;
     private Scene scene;
 
-    public WhoScene(UI2 app) {
+    public WhoScene(UIManager app) {
         this.app = app;
         createScene();
     }
