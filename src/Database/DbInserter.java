@@ -50,13 +50,12 @@ public class DbInserter extends DbManager {
             locationId = insertUniqueSQLAttribute("location");
 
         System.out.println("Inserting into issues table..");
-        insertIssueIntoTable(category.getKey());
+        insertIssueIntoTable();
     }
 
 
 
     private int checkIfAttributeExists(String attribute) {
-//        String table = attribute + "s";
         try {
             ResultSet resultSet = null;
             PreparedStatement preparedStatement = null;
@@ -121,7 +120,9 @@ public class DbInserter extends DbManager {
 
 
 
-    private void insertIssueIntoTable(int categoryId) {
+    private void insertIssueIntoTable() {
+        int categoryId = this.category.getKey();
+
         try {
             PreparedStatement insertIssueQuery = connection.prepareStatement(
             "INSERT INTO issues (date, description, category_id, status_id, location_id, citizen_id)"
