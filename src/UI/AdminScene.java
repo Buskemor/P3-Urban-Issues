@@ -115,6 +115,8 @@ public class AdminScene {
                 statusDropdown.setOnAction(event -> {
                     Status newStatus = statusDropdown.getValue();
                     Issue currentIssue = getTableView().getItems().get(getIndex());
+                    System.out.println(getIndex());
+                    System.out.println("HEREE!");
                     dbFetcher.updateIssueStatus(currentIssue, newStatus); // Update in DB
                     currentIssue.setStatus(newStatus); // Update in the model
                     getTableView().refresh(); // Refresh table to show updated status maybe doesnt do anything

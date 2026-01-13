@@ -73,10 +73,9 @@ public class DbInserter extends DbManager {
                 resultSet = preparedStatement.executeQuery();
             }
 
-            while(resultSet.next()) {
-                System.out.println("    "+attribute +" already exists as "+attribute+"_id: " + resultSet.getInt(attribute+"_id"));
+            while(resultSet.next())
                 return resultSet.getInt(attribute+"_id");
-            }
+
         } catch (SQLException e) {
             System.out.println(e);
         }
@@ -137,7 +136,6 @@ public class DbInserter extends DbManager {
             } else {
                 insertIssueQuery.setInt(6, citizenId);
             }
-
             insertIssueQuery.execute();
 
             System.out.println("Issue inserted into issues table successfully.");
